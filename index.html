@@ -1,0 +1,2973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>IFT Crew Mapper v5</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#09111f;--surface:#0f1c30;--panel:#152236;--card:#1a2b42;
+  --border:#1e3050;--border2:#2a4268;
+  --accent:#3b82f6;--accent-glow:#3b82f620;
+  --green:#22c55e;--green-bg:#0f2d1a;--green-border:#16a34a40;
+  --yellow:#f59e0b;--yellow-bg:#2d1d08;--yellow-border:#d9770640;
+  --red:#ef4444;--red-bg:#2d0d0d;--red-border:#dc262640;
+  --purple:#a78bfa;--purple-bg:#1e1040;
+  --teal:#2dd4bf;--teal-bg:#0a2028;
+  --orange:#f97316;--orange-bg:#2d1500;
+  --text:#dde6f0;--muted:#4a6080;--muted2:#7a9ab8;
+  --sac:#0d2040;--sc:#0a2518;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:8px;--r2:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;display:flex;flex-direction:column}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 16px;flex-shrink:0;z-index:100}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);white-space:nowrap}
+.logo span{color:var(--muted2);font-size:10px}
+.top-pill{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:4px 9px;font-size:10px;color:var(--muted2);white-space:nowrap;flex-shrink:0}
+.spacer{flex:1}
+.upload-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:1px dashed var(--border2);background:transparent;color:var(--muted2);font-family:var(--font);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.upload-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--panel);color:var(--text)}
+.btn-danger{background:#3d1010;color:#fca5a5;border:1px solid #7f1d1d}.btn-danger:hover{background:#7f1d1d}
+.btn-sm{padding:3px 8px;font-size:11px}
+.shell{display:flex;flex:1;overflow:hidden}
+.sidebar{width:250px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.sidebar-section{padding:11px 13px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);cursor:pointer;font-size:12px;font-weight:500;color:var(--muted2);transition:all .12s;margin-bottom:2px}
+.nav-item:hover{background:var(--panel);color:var(--text)}
+.nav-item.active{background:var(--accent-glow);color:var(--accent);border:1px solid var(--border)}
+.nav-icon{width:16px;text-align:center;font-size:13px}
+.nav-badge{margin-left:auto;font-family:var(--mono);font-size:10px;background:var(--panel);border:1px solid var(--border);padding:1px 5px;border-radius:3px}
+.date-item{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;cursor:pointer;font-size:11px;color:var(--muted2);transition:all .12s;border:1px solid transparent}
+.date-item:hover{background:var(--panel)}.date-item.active{background:var(--accent-glow);border-color:var(--border);color:var(--accent)}
+.date-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.date-item.active .date-dot{background:var(--accent)}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:11px 13px}
+.rules-box{padding:9px 11px;background:var(--panel);border-radius:var(--r);border:1px solid var(--border);font-size:10px;line-height:1.8;color:var(--muted2)}
+.rules-box b{color:var(--text)}
+.toolbar{height:41px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;flex-shrink:0;overflow-x:auto}
+.tab{padding:0 14px;height:41px;display:flex;align-items:center;font-size:11.5px;font-weight:500;color:var(--muted2);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap}
+.tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.toolbar-spacer{flex:1}
+.content{flex:1;overflow-y:auto;padding:16px}
+.pane{display:none}.pane.active{display:block}
+.summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-bottom:14px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
+.sum-label{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.sum-val{font-size:22px;font-weight:700;font-family:var(--mono);line-height:1}
+.sum-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.c-green{color:var(--green)}.c-red{color:var(--red)}.c-yellow{color:var(--yellow)}.c-blue{color:var(--accent)}.c-purple{color:var(--purple)}.c-teal{color:var(--teal)}.c-orange{color:var(--orange)}
+.zone-block{margin-bottom:16px;border-radius:var(--r2);border:1px solid var(--border);overflow:hidden}
+.zone-hdr{display:flex;align-items:center;gap:8px;padding:9px 13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.zone-hdr.sac{background:var(--sac);border-bottom:1px solid #1a3a6a;color:#7ab4f5}
+.zone-hdr.sc{background:var(--sc);border-bottom:1px solid #1a4a2a;color:#6ee7b7}
+.shift-info{font-weight:400;opacity:.7;font-size:10px}
+.z-stats{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
+.zs-chip{font-size:10px;font-weight:700;font-family:var(--mono);padding:2px 7px;border-radius:4px}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--panel);color:var(--muted2);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:7px 9px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap;position:sticky;top:0}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:rgba(59,130,246,.04)}
+tbody td{padding:6px 9px;vertical-align:middle;font-size:11px}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap}
+.pill-assigned{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.pill-unassigned{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.pill-partial{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;white-space:nowrap}
+.los-wc{background:#0d2040;color:#93c5fd}.los-bwc{background:#1e1040;color:#c4b5fd}
+.los-gu{background:#2d1d08;color:#fcd34d}.los-bgu{background:#2d1200;color:#fb923c}
+.los-bls{background:#0a2028;color:#2dd4bf}.los-cct{background:#1a1040;color:#a78bfa}
+.los-ewc{background:#0a2018;color:#6ee7b7}
+.crew-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dot-emt{background:var(--purple)}.dot-ne{background:var(--accent)}.dot-rn{background:var(--teal)}
+.wr-badge{font-size:9px;background:var(--teal-bg);color:var(--teal);border:1px solid #2dd4bf30;border-radius:3px;padding:1px 5px;font-family:var(--mono)}
+.roster-grid{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.roster-hdr,.roster-row{display:grid;grid-template-columns:26px 1fr 118px 88px 120px 210px 52px;align-items:center}
+.roster-hdr{background:var(--panel);border-bottom:1px solid var(--border2)}
+.roster-hdr div{padding:7px 9px;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted2)}
+.roster-row{border-bottom:1px solid var(--border);transition:background .1s}
+.roster-row:hover{background:rgba(59,130,246,.03)}.roster-row.blocked{opacity:.45}
+.roster-row div{padding:5px 9px}
+.rn-num{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.day-chips{display:flex;gap:2px}
+.dc{width:25px;height:21px;border-radius:3px;border:1px solid var(--border2);background:var(--bg);color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;font-family:var(--mono);user-select:none}
+.dc.on{background:#0d2040;color:#93c5fd;border-color:var(--accent)}.dc.off{background:#111;color:#333;border-color:#222}.dc.today{outline:2px solid var(--accent);outline-offset:1px}
+select,input[type=text],input[type=password]{background:var(--bg);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 7px;font-family:var(--font);font-size:11px;outline:none;transition:border-color .15s;width:100%}
+select:focus,input:focus{border-color:var(--accent)}
+.stat-active{color:var(--green)}.stat-inactive{color:var(--muted)}.stat-leave{color:var(--yellow)}.stat-suspended{color:var(--red)}
+.add-row{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;padding:10px 11px;background:var(--panel);border-radius:var(--r);border:1px solid var(--border)}
+.add-row input{width:175px}.add-row select{width:125px}
+.veh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px;margin-top:12px}
+.veh-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:border-color .15s}
+.veh-card:hover{border-color:var(--border2)}.veh-card.oos{opacity:.45;border-style:dashed}
+.avail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:border-color .15s}
+.emp-card:hover{border-color:var(--border2)}.emp-card.blocked{opacity:.38}
+.emp-card-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.emp-name{font-weight:600;font-size:12px;flex:1}
+.emp-meta{font-size:10px;color:var(--muted);margin-bottom:7px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.emp-zone-tag{padding:2px 5px;border-radius:3px;font-size:9px;font-weight:700}
+.tz-sac{background:var(--sac);color:#7ab4f5}.tz-sc{background:var(--sc);color:#6ee7b7}
+.avail-trip{display:flex;align-items:center;gap:5px;padding:4px 0;border-top:1px solid var(--border);font-size:11px}
+.at-auth{font-family:var(--mono);font-size:10px;color:var(--accent);width:72px;flex-shrink:0}
+.at-time{color:var(--muted2);width:38px;flex-shrink:0}
+.at-free{font-size:10px;padding:1px 5px;border-radius:3px;font-family:var(--mono);margin-left:auto;white-space:nowrap}
+.f-ok{background:var(--green-bg);color:var(--green)}.f-warn{background:var(--yellow-bg);color:var(--yellow)}.f-none{background:var(--red-bg);color:var(--red)}
+.idle-note{color:var(--muted);font-style:italic;font-size:11px;padding-top:7px;border-top:1px solid var(--border);text-align:center}
+.crews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:10px}
+.crew-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:border-color .15s}
+.crew-card:hover{border-color:var(--border2)}
+.crew-card.emt-c{border-left:3px solid var(--purple)}.crew-card.ne-c{border-left:3px solid var(--accent)}.crew-card.rn-c{border-left:3px solid var(--teal)}
+.crew-card-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.crew-name-display{font-size:13px;font-weight:700;flex:1;cursor:pointer;padding:2px 5px;border-radius:4px;transition:background .12s}
+.crew-name-display:hover{background:var(--panel)}
+.crew-name-input{font-size:13px;font-weight:700;flex:1;background:var(--bg);border:1px solid var(--accent);border-radius:4px;padding:2px 7px;color:var(--text);font-family:var(--font);outline:none}
+.crew-members{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.cmr{display:flex;align-items:center;gap:6px;padding:4px 7px;background:var(--panel);border-radius:4px;font-size:11px}
+.crew-stats{display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:var(--muted);border-top:1px solid var(--border);padding-top:7px}
+.shift-block{display:flex;border-radius:5px;overflow:hidden;border:1px solid var(--border2);margin-bottom:8px}
+.sh-seg{display:flex;flex-direction:column;align-items:center;padding:5px 9px;min-width:58px;background:#0d2040}
+.sh-seg-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:1px}
+.sh-seg-val{font-family:var(--mono);font-size:13px;font-weight:600;color:#93c5fd}
+.sh-mid{flex:1;background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:50px;position:relative;overflow:hidden}
+.sh-stripe{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 7px,rgba(59,130,246,.04) 7px,rgba(59,130,246,.04) 8px)}
+.sh-mid-txt{font-size:9px;color:var(--muted);z-index:1}
+.sh-lunch{display:flex;flex-direction:column;align-items:center;padding:5px 9px;background:#1a2010;border-left:1px solid #2d3810;min-width:60px}
+.sh-lunch-lbl{font-size:8px;font-weight:700;text-transform:uppercase;color:#6b8a3a;margin-bottom:1px}
+.sh-lunch-val{font-family:var(--mono);font-size:11px;color:#a3c45a}
+.section-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.section-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.05em;text-transform:uppercase}
+.info-banner{background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--yellow);margin-bottom:11px}
+.empty{text-align:center;padding:40px;color:var(--muted);font-style:italic}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r2);padding:32px;text-align:center;transition:all .2s;cursor:pointer;background:var(--panel);margin-bottom:16px}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-glow)}
+.api-row{display:flex;gap:7px;align-items:center;margin-bottom:11px}
+.api-row input{flex:1;font-family:var(--mono);font-size:11px}
+#toast{position:fixed;bottom:16px;right:16px;background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999;max-width:340px}
+#toast.show{opacity:1}#toast.warn{background:#b45309}#toast.err{background:#b91c1c}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+tr.wr-row{background:rgba(45,212,191,.05)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">IFT CREW MAPPER <span>v5</span></div>
+  <div class="top-pill" id="topDatePill">No file loaded</div>
+  <div class="spacer"></div>
+  <label class="upload-btn" for="fileTrips">Trip File</label>
+  <input type="file" id="fileTrips" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'trips')"/>
+  <label class="upload-btn" for="fileUsers">Crew File</label>
+  <input type="file" id="fileUsers" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'users')"/>
+  <label class="upload-btn" for="fileVeh">Vehicle File</label>
+  <input type="file" id="fileVeh" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'vehicles')"/>
+  <label class="upload-btn" for="fileHistory">Historic Trips</label>
+  <input type="file" id="fileHistory" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'history')"/>
+  <label class="upload-btn" for="fileSched" style="border-color:#7c3aed50;color:#a78bfa">&#x1F4CB; Schedule File</label>
+  <input type="file" id="fileSched" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'schedule')"/>
+  <button class="btn btn-primary" onclick="runAllMappings()">Run Mapping</button>
+  <button class="btn btn-ghost" onclick="exportAssignmentsToExcel()">Export Excel</button>
+</div>
+<div class="shell">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Views</div>
+      <div class="nav-item active" onclick="switchView('assignments',this)"><span class="nav-icon">&#x1F4CB;</span>Assignments<span class="nav-badge" id="nb-assign">-</span></div>
+      <div class="nav-item" onclick="switchView('crews',this)"><span class="nav-icon">&#x1F691;</span>Crews<span class="nav-badge" id="nb-crews">-</span></div>
+      <div class="nav-item" onclick="switchView('availability',this)"><span class="nav-icon">&#x1F550;</span>Availability</div>
+      <div class="nav-item" onclick="switchView('roster',this)"><span class="nav-icon">&#x1F465;</span>Crew Roster<span class="nav-badge" id="nb-roster">-</span></div>
+      <div class="nav-item" onclick="switchView('vehicles',this)"><span class="nav-icon">&#x1F690;</span>Vehicles<span class="nav-badge" id="nb-veh">-</span></div>
+      <div class="nav-item" onclick="switchView('settings',this)"><span class="nav-icon">&#x2699;&#xFE0F;</span>Settings</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Dates</div>
+      <div id="dateList"><div style="color:var(--muted);font-size:11px;font-style:italic">Upload trip file</div></div>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="sidebar-label" style="margin-bottom:6px">LOS Engine Rules</div>
+      <div class="rules-box">
+        <b>WC / E-WC</b> = 1 Non-EMT<br>
+        <b>Bariatric WC</b> = 1 Non-EMT + bariatric vehicle<br>
+        <b>Gurney / B-Gurney</b> = 2 Non-EMT (EMT fallback)<br>
+        <b>BLS</b> = 2 EMT . SAC only<br>
+        <b>CCT</b> = 2 EMT + 1 RN . SAC only . max 1/base<br>
+        <b>Special Equip</b> = crew max(2,std)<br><br>
+        <b>Vehicles:</b><br>
+        WC/E-WC = WC Van or Gurney Van<br>
+        Bariatric WC = Gurney Van (bariatric)<br>
+        Gurney = Gurney Van or Ambulance<br>
+        BLS/CCT = Ambulance only<br>
+        Gurney Van = also serves EC transports<br><br>
+        <b>Block time (no W&R):</b><br>
+        in-trip time + transit to next pickup<br>
+        Fallback: Est.Transport or Min.Travel + 15m<br><br>
+        <b>Shift start:</b><br>
+        travel &lt;=30m: pickup - 60min<br>
+        travel &gt;30m: pickup - (30+travel)<br>
+        <b>Lunch</b>: shift+4.5hr, 30min unpaid
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="toolbar">
+      <div class="tab active" id="tab-assignments" onclick="switchTab('assignments',this)">Trip Assignments</div>
+      <div class="tab" id="tab-crews" onclick="switchTab('crews',this)">Crews</div>
+      <div class="tab" id="tab-availability" onclick="switchTab('availability',this)">Availability</div>
+      <div class="tab" id="tab-forecast" onclick="switchTab('forecast',this)">Forecast</div>
+      <div class="tab" id="tab-roster" onclick="switchTab('roster',this)">Crew Roster</div>
+      <div class="tab" id="tab-vehicles" onclick="switchTab('vehicles',this)">Vehicles</div>
+      <div class="tab" id="tab-settings" onclick="switchTab('settings',this)">Settings</div>
+      <div class="toolbar-spacer"></div>
+      <select id="dateFilter" style="width:150px;font-size:11px" onchange="activeDate=this.value;renderCurrentView()">
+        <option value="all">All dates</option>
+      </select>
+    </div>
+    <div class="content">
+      <div class="pane active" id="pane-assignments">
+        <div id="assignments-content">
+          <div class="upload-zone" onclick="document.getElementById('fileTrips').click()"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="event.preventDefault();this.classList.remove('drag');handleFileDrop(event,'trips')">
+            <h3 style="margin-bottom:7px">Upload Trip File to Begin</h3>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Drag and drop or click to select .xlsx file</p>
+            <button class="btn btn-primary" onclick="event.stopPropagation();document.getElementById('fileTrips').click()">Choose File</button>
+          </div>
+        </div>
+      </div>
+      <div class="pane" id="pane-crews">
+        <div class="section-hdr">
+          <span class="section-title">Crews</span>
+          <span class="badge" style="background:var(--panel);color:var(--muted2);border:1px solid var(--border)" id="crewCount">-</span>
+          <span style="font-size:11px;color:var(--muted)">Click name to rename . shift set by first trip</span>
+        </div>
+        <div id="crews-content"><div class="empty">Run mapping to see crews</div></div>
+      </div>
+      <div class="pane" id="pane-availability">
+        <div class="section-hdr"><span class="section-title">Employee Availability</span><span style="font-size:11px;color:var(--muted)">Shift + lunch times per employee</span></div>
+        <div class="avail-grid" id="availGrid"><div class="empty">Run mapping to see availability</div></div>
+      </div>
+      <div class="pane" id="pane-forecast">
+        <div class="section-hdr"><span class="section-title">Forecast</span><span style="font-size:11px;color:var(--muted)">Demand prediction from historical trips</span></div>
+        <div id="forecast-content"><div class="empty">Upload historic data to see demand forecasts</div></div>
+      </div>
+      <div class="pane" id="pane-roster">
+        <div class="section-hdr">
+          <span class="section-title">Crew Roster</span>
+          <span class="badge" style="background:var(--panel);color:var(--muted2);border:1px solid var(--border)" id="rosterCount">-</span>
+          <span id="saveInd" style="font-size:10px;color:var(--green);font-family:var(--mono);display:none">saved</span>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearSaved()">Reset defaults</button>
+        </div>
+        <div class="info-banner">Status controls scheduling. Day chips set working days. Upload a crew file to replace the full roster. Excel columns Mon–Sun or Working Days are now imported.</div>
+        <div class="roster-grid">
+          <div class="roster-hdr"><div>#</div><div>Name</div><div>Zone</div><div>Type</div><div>Status</div><div>Working Days</div><div></div></div>
+          <div id="rosterBody"></div>
+        </div>
+        <div class="add-row">
+          <input type="text" id="newName" placeholder="Full name"/>
+          <select id="newZone"><option>SACRAMENTO</option><option>SANTA CLARA</option></select>
+          <select id="newType"><option>Non-EMT</option><option>EMT</option><option>RN</option></select>
+          <button class="btn btn-primary" onclick="addEmployee()">Add Employee</button>
+        </div>
+      </div>
+      <div class="pane" id="pane-vehicles">
+        <div class="section-hdr">
+          <span class="section-title">Vehicle Fleet</span>
+          <span class="badge" style="background:var(--panel);color:var(--muted2);border:1px solid var(--border)" id="vehCount">-</span>
+          <span style="font-size:11px;color:var(--muted)">Toggle Bariatric and Status inline</span>
+        </div>
+        <div id="veh-content"><div class="empty">Loading vehicles...</div></div>
+      </div>
+      <div class="pane" id="pane-settings">
+        <div class="section-hdr"><span class="section-title">Settings</span></div>
+        <div style="max-width:580px;display:flex;flex-direction:column;gap:14px">
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:15px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+              <div class="sidebar-label" style="margin:0">Homebase Integration</div>
+              <span style="margin-left:auto;font-size:10px;font-family:var(--mono)" id="hbStatus">Not configured</span>
+              <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;white-space:nowrap">
+                <input type="checkbox" id="hbEnabled" onchange="saveSettings();updateHbStatus();runAllMappings()"/>
+                Use for mapping
+              </label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="api-row" style="margin:0">
+                <input type="password" id="hbToken" placeholder="Homebase API Bearer token" oninput="saveSettings();updateHbStatus()"/>
+                <button class="btn btn-ghost btn-sm" onclick="hbLoadLocations()">Load Locations</button>
+              </div>
+              <div style="font-size:10px;color:var(--muted);line-height:1.6">
+                Get your token from <b style="color:var(--muted2)">Homebase &rarr; Settings &rarr; API</b>.
+                After pasting, click <b style="color:var(--muted2)">Load Locations</b> to populate the dropdowns below.
+              </div>
+              <div style="display:flex;gap:7px;align-items:center">
+                <span style="font-size:11px;color:var(--muted2);width:108px;flex-shrink:0">Sacramento loc</span>
+                <select id="hbSacUuid" onchange="saveSettings()" style="flex:1"><option value="">-- load locations first --</option></select>
+              </div>
+              <div style="display:flex;gap:7px;align-items:center">
+                <span style="font-size:11px;color:var(--muted2);width:108px;flex-shrink:0">Santa Clara loc</span>
+                <select id="hbScUuid" onchange="saveSettings()" style="flex:1"><option value="">-- load locations first --</option></select>
+              </div>
+              <button class="btn btn-primary" onclick="syncHomebase()" style="margin-top:4px">&#x21BA; Sync Schedule from Homebase</button>
+              <div style="font-size:10px;color:var(--muted);line-height:1.7">
+                Pulls <b style="color:var(--muted2)">published shifts</b> for the selected date. Employee names, exact shift start/end, and roles come directly from Homebase — replacing the static roster for that day.<br>
+                Role mapping: <span style="font-family:var(--mono);color:var(--accent)">EMT / Paramedic &rarr; EMT &nbsp; RN / Nurse &rarr; RN &nbsp; all others &rarr; Non-EMT</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:15px">
+            <div class="sidebar-label" style="margin-bottom:9px">Google Distance Matrix API</div>
+            <div class="api-row">
+              <input type="password" id="googleApiKey" placeholder="Paste API key here" oninput="saveSettings()"/>
+              <button class="btn btn-ghost btn-sm" onclick="testApiKey()">Test</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearTravelCache()">Clear Cache</button>
+            </div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.6">Calculates drive time from base &rarr; pickup (shift start) and between trips (block time). Falls back to Min of Travel if unavailable.</div>
+            <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:6px" id="cacheCount"></div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:15px">
+            <div class="sidebar-label" style="margin-bottom:9px">Zoho Creator</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <input type="text" id="zohoApiUrl" placeholder="Full Zoho Creator endpoint URL" oninput="saveSettings()"/>
+                <select id="zohoAuthType" onchange="saveSettings()" style="padding:4px 7px;font-size:11px;background:var(--bg);color:var(--text);border:1px solid var(--border2);border-radius:4px;">
+                  <option value="API Key">Public API Key (header)</option>
+                  <option value="API Key Query">Public API Key (query param)</option>
+                  <option value="Bearer">Bearer Token</option>
+                  <option value="Zoho">Zoho OAuth Token</option>
+                </select>
+                <input type="password" id="zohoApiToken" placeholder="Zoho public key or bearer token" oninput="saveSettings()"/>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <input type="date" id="zohoDateFrom" style="flex:1;min-width:120px" oninput="saveSettings()"/>
+                  <input type="date" id="zohoDateTo" style="flex:1;min-width:120px" oninput="saveSettings()"/>
+                </div>
+              </div>
+              <div class="api-row" style="margin:0">
+                <button class="btn btn-primary btn-sm" onclick="syncZohoTrips()">Fetch Zoho Trips</button>
+                <button class="btn btn-ghost btn-sm" onclick="syncZohoHistory()">Fetch Historic Data</button>
+              </div>
+              <div style="font-size:10px;color:var(--muted);line-height:1.6">
+                Enter the full Zoho Creator endpoint URL, for example <code>https://www.zohoapis.com/creator/custom/traumalifecare/fetchtrips</code>.
+                Do not paste the public key into the URL field — use the token field below.
+                For public-key access, choose <strong>Public API Key (query param)</strong> to send it as <code>publickey=...</code>, or choose <strong>Public API Key (header)</strong> to send it as a header.
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:15px">
+            <div class="sidebar-label" style="margin-bottom:9px">Base Addresses <span style="font-weight:400;font-size:9px;color:var(--muted)">(origin for distance API)</span></div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;gap:7px;align-items:center">
+                <span style="font-size:11px;color:var(--muted2);width:108px;flex-shrink:0">SACRAMENTO</span>
+                <input type="text" id="sacAddress" placeholder="e.g. 123 Main St, Sacramento, CA" oninput="saveSettings()"/>
+              </div>
+              <div style="display:flex;gap:7px;align-items:center">
+                <span style="font-size:11px;color:var(--muted2);width:108px;flex-shrink:0">SANTA CLARA</span>
+                <input type="text" id="scAddress" placeholder="e.g. 456 Park Ave, Santa Clara, CA" oninput="saveSettings()"/>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+// LOS RULES
+const LOS_RULES={
+  'WHEELCHAIR':          {crew:1,ne:1,emt:0,rn:0,bariatric:false,sacOnly:false,vehicles:['Wheelchair Van','Gurney Van']},
+  'ELECTRIC WC':         {crew:1,ne:1,emt:0,rn:0,bariatric:false,sacOnly:false,vehicles:['Wheelchair Van','Gurney Van']},
+  'BARIATRIC WC':        {crew:1,ne:1,emt:0,rn:0,bariatric:true, sacOnly:false,vehicles:['Gurney Van']},
+  'BARIATRIC WHEELCHAIR':{crew:1,ne:1,emt:0,rn:0,bariatric:true, sacOnly:false,vehicles:['Gurney Van']},
+  'GURNEY':              {crew:2,ne:2,emt:0,rn:0,bariatric:false,sacOnly:false,vehicles:['Gurney Van','Ambulance']},
+  'BARIATRIC GURNEY':    {crew:2,ne:2,emt:0,rn:0,bariatric:false,sacOnly:false,vehicles:['Gurney Van','Ambulance']},
+  'BLS':                 {crew:2,ne:0,emt:2,rn:0,bariatric:false,sacOnly:true, vehicles:['Ambulance']},
+  'CCT':                 {crew:3,ne:0,emt:2,rn:1,bariatric:false,sacOnly:true, vehicles:['Ambulance']},
+};
+
+// NEW: Base Capabilities for dynamic zoning
+const BASE_CAPABILITIES = {
+  "SACRAMENTO": ["WHEELCHAIR", "ELECTRIC WC", "BARIATRIC WC", "GURNEY", "BARIATRIC GURNEY", "BLS", "CCT"],
+  "SANTA CLARA": ["WHEELCHAIR", "ELECTRIC WC", "BARIATRIC WC", "GURNEY", "BARIATRIC GURNEY", "BLS"], // BLS capability mapped
+  "SAN JOSE": ["WHEELCHAIR", "ELECTRIC WC", "BARIATRIC WC", "GURNEY", "BARIATRIC GURNEY", "BLS"] // Future proofing expansion
+};
+
+const LOS_ALIAS={'WC':'WHEELCHAIR','WHEELCHAIR':'WHEELCHAIR','ELECTRIC WC':'ELECTRIC WC','EWC':'ELECTRIC WC','BARIATRIC WC':'BARIATRIC WC','BARIATRIC WHEELCHAIR':'BARIATRIC WC','GURNEY':'GURNEY','BARIATRIC GURNEY':'BARIATRIC GURNEY','BLS':'BLS','CCT':'CCT','ALS':'CCT'};
+function normLOS(s){
+  const u=String(s).trim().toUpperCase();
+  if(u.includes('ALS')) return 'CCT';
+  return LOS_ALIAS[u]||u;
+}
+const LOS_CLASS={'WHEELCHAIR':'los-wc','BARIATRIC WC':'los-bwc','ELECTRIC WC':'los-ewc','GURNEY':'los-gu','BARIATRIC GURNEY':'los-bgu','BLS':'los-bls','CCT':'los-cct'};
+// Prioritize non-EMT wheelchair trips first so EMTs remain available for Gurney/BLS/CCT
+const PASSES=['WHEELCHAIR','ELECTRIC WC','BARIATRIC WC','BARIATRIC GURNEY','GURNEY','BLS','CCT'];
+const NO_EMT_FALLBACK=['WHEELCHAIR','ELECTRIC WC','BARIATRIC WC'];
+function canFallbackToEMT(trip){
+  if(NO_EMT_FALLBACK.includes(trip.los)) return false;
+  if(trip.zone==='SANTA CLARA' && (trip.los==='GURNEY' || trip.los==='BARIATRIC GURNEY')) return false;
+  return true;
+}
+function useEMTForTrip(trip,rule){
+  if(rule.emt>0) return true;
+  return trip.zone==='SACRAMENTO' && (trip.los==='GURNEY' || trip.los==='BARIATRIC GURNEY');
+}
+const COMPLETION_MINUTES=45,WR_BLOCK=180,SHIFT_TOTAL=8*60+30,PREP_MAX=60;
+const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+
+// --- FUNNEL LOGIC FUNCTIONS ---
+function checkLocationAndCapability(zone, los) {
+  const allowed = BASE_CAPABILITIES[zone] || [];
+  return allowed.includes(normLOS(los));
+}
+
+function crewBusy(date, cname, trip) {
+  const m = mappings[date];
+  if (!m) return false;
+  const { empState, emtPairs } = m;
+  let members = [];
+  
+  // Find crew members
+  Object.values(emtPairs).forEach(p => { 
+    if ((p.crewName || p.defaultName) === cname) members = p.ids.map(id => empState[id]).filter(Boolean); 
+  });
+  if (!members.length) {
+    Object.values(empState).forEach(e => { 
+      if ((e.crewName || lastName(e.name)) === cname) members.push(e); 
+    });
+  }
+
+  // Interval Collision Logic
+  const newStart = trip.pickupMins;
+  const newEnd = newStart + fallbackBlock(trip);
+
+  return members.some(e => e.assignments?.some(a => newStart < a.blockEnd && newEnd > a.pickup));
+}
+
+function getValidCrewsForTrip(date, trip) {
+  const m = mappings[date];
+  if (!m) return [];
+  const { empState, emtPairs } = m;
+  const valid = [];
+
+  // Gather all possible crews in that zone
+  Object.values(emtPairs).forEach(p => {
+    if (p.zone === trip.zone) valid.push({ name: p.crewName || p.defaultName, type: 'EMT Pair', zone: p.zone });
+  });
+  Object.values(empState).forEach(e => {
+    if (e.type !== 'EMT' && e.active && e.zone === trip.zone && e.crewName) valid.push({ name: e.crewName, type: e.type, zone: e.zone });
+  });
+
+  const unique = [...new Map(valid.map(c => [c.name, c])).values()].sort((a, b) => a.name.localeCompare(b.name));
+
+  // The Filtering Engine
+  return unique.filter(crew => {
+    if (!checkLocationAndCapability(crew.zone, trip.los)) return false; // Location / Capability Check
+    if (crewBusy(date, crew.name, trip)) return false; // Time Availability Check
+    return true;
+  });
+}
+// --- END FUNNEL LOGIC ---
+
+const DEFAULT_USERS=[
+  {name:"Evan Seidell",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Meontae Sapp",zone:"SANTA CLARA",type:"Non-EMT",status:"Active"},
+  {name:"William Rodriguez",zone:"SANTA CLARA",type:"Non-EMT",status:"Active"},
+  {name:"Cole Flores",zone:"SANTA CLARA",type:"Non-EMT",status:"Active"},
+  {name:"Alex Tan",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Jose Ceja",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Ed Goforth",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Abdul Abohasan",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Alex Gill",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Sam Sultani",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Adarsh Narayan",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Mikayla Cook",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Veronica Gutierrez",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Beau Brockway",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"David Dominguez",zone:"SANTA CLARA",type:"Non-EMT",status:"Active"},
+  {name:"Braydon Vert",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Santos Ortiz",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Joseph Davis",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Isiah Akins",zone:"SANTA CLARA",type:"Non-EMT",status:"Active"},
+  {name:"Ahmad Asghari",zone:"SANTA CLARA",type:"Non-EMT",status:"Active"},
+  {name:"Jose Francisco Vazquez Martinez",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"Haani Khan",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Jackson Gilliland",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Rahman Mohammad",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Carter Thomas",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Ola Olalere",zone:"SACRAMENTO",type:"Non-EMT",status:"Active"},
+  {name:"William Doutherd Jr",zone:"SACRAMENTO",type:"Non-EMT",status:"On Leave"},
+  {name:"Jason Knight",zone:"SACRAMENTO",type:"EMT",status:"Active"},
+  {name:"Steven Adeosun",zone:"SACRAMENTO",type:"RN",status:"Active"},
+];
+const DEFAULT_VEHICLES=[
+  {name:"GW011",plate:"02757J4",type:"Gurney Van",status:"In-Service",location:"SANTA CLARA",bariatric:false},
+  {name:"GW012",plate:"48390G4",type:"Gurney Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"GW010",plate:"42151Z2",type:"Gurney Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"GW009",plate:"36202D4",type:"Gurney Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"GW008",plate:"51887X3",type:"Gurney Van",status:"In-Service",location:"SANTA CLARA",bariatric:false},
+  {name:"GW007",plate:"07593H4",type:"Gurney Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"WC005",plate:"51055U3",type:"Wheelchair Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"WC004",plate:"85249Y3",type:"Wheelchair Van",status:"In-Service",location:"SANTA CLARA",bariatric:false},
+  {name:"M26",plate:"80103N3",type:"Ambulance",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"M20",plate:"75667T2",type:"Ambulance",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"M25",plate:"38133U2",type:"Ambulance",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"M23",plate:"97731S2",type:"Ambulance",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"GW002",plate:"30874N3",type:"Gurney Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"M24",plate:"38134U2",type:"Ambulance",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+  {name:"GW003",plate:"61109N3",type:"Gurney Van",status:"In-Service",location:"SACRAMENTO",bariatric:false},
+];
+
+let tripsData=[],historicalTrips=[],mappings={},allDates=[],activeDate='all',activeView='assignments';
+let manualOverrides={},crewNameOverrides={},nextId=100,travelCache={};
+let settings={apiKey:'__GOOGLE_MAPS_API_KEY__',sacAddress:'__SAC_ADDRESS__',scAddress:'__SC_ADDRESS__',hbToken:'__HB_TOKEN__',hbSacUuid:'__HB_SAC_UUID__',hbScUuid:'__HB_SC_UUID__',hbEnabled:false,zohoApiUrl:'__ZOHO_API_URL__',zohoApiToken:'__ZOHO_API_TOKEN__',zohoAuthType:'API Key',zohoDateFrom:'',zohoDateTo:''};
+let hbSchedule={};  // date → [{name,type,zone,shiftStart,shiftEnd}] from Homebase
+let scheduleData={};  // date → [{vehicle,names,shiftStart,shiftEnd,zone}] from Excel schedule
+let historicalDemand={};
+let roster=[],vehicles=[];
+
+// PERSISTENCE
+function saveRoster(){
+  try{localStorage.setItem('ift5_roster',JSON.stringify({roster,nextId}));localStorage.setItem('ift5_cnames',JSON.stringify(crewNameOverrides));flashSave();}catch(e){}
+}
+function flashSave(){const el=document.getElementById('saveInd');if(el){el.style.display='inline';clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',1800);}}
+function saveVehicles(){try{localStorage.setItem('ift5_vehicles',JSON.stringify(vehicles));}catch(e){}}
+function saveSettings(){
+  settings.apiKey    =document.getElementById('googleApiKey')?.value||'';
+  settings.sacAddress=document.getElementById('sacAddress')?.value||'';
+  settings.scAddress =document.getElementById('scAddress')?.value||'';
+  settings.hbToken   =document.getElementById('hbToken')?.value||'';
+  settings.hbSacUuid =document.getElementById('hbSacUuid')?.value||'';
+  settings.hbScUuid  =document.getElementById('hbScUuid')?.value||'';
+  settings.hbEnabled =document.getElementById('hbEnabled')?.checked||false;
+  settings.hbRoleNE  =document.getElementById('hbRoleNE')?.value||'Non-EMT,Driver,NEMT';
+  settings.hbRoleEMT =document.getElementById('hbRoleEMT')?.value||'EMT,EMT-B,Paramedic';
+  settings.hbRoleRN  =document.getElementById('hbRoleRN')?.value||'RN,Nurse,Registered Nurse';
+  settings.hbDeptSac =document.getElementById('hbDeptSac')?.value||'';
+  settings.hbDeptSc  =document.getElementById('hbDeptSc')?.value||'';
+  settings.zohoApiUrl =document.getElementById('zohoApiUrl')?.value.trim()||'';
+  settings.zohoAuthType =document.getElementById('zohoAuthType')?.value||'API Key';
+  settings.zohoApiToken =document.getElementById('zohoApiToken')?.value.trim()||'';
+  settings.zohoDateFrom =document.getElementById('zohoDateFrom')?.value||'';
+  settings.zohoDateTo =document.getElementById('zohoDateTo')?.value||'';
+  try{localStorage.setItem('ift5_settings',JSON.stringify(settings));}catch(e){}
+}
+function loadAll(){
+  try{
+    const r=localStorage.getItem('ift5_roster');
+    if(r){const p=JSON.parse(r);if(p.roster?.length){roster=p.roster;nextId=p.nextId||nextId;}}else buildDefaultRoster();
+    const cn=localStorage.getItem('ift5_cnames');if(cn)crewNameOverrides=JSON.parse(cn);
+    const vr=localStorage.getItem('ift5_vehicles');if(vr)vehicles=JSON.parse(vr);else buildDefaultVehicles();
+    const st=localStorage.getItem('ift5_settings');if(st){try{const saved=JSON.parse(st);Object.assign(settings,saved);}catch(e){}}
+    const tc=localStorage.getItem('ift5_tcache');if(tc)travelCache=JSON.parse(tc);
+    const dc=localStorage.getItem('ift5_distcache');if(dc)distCache=JSON.parse(dc);
+  }catch(e){buildDefaultRoster();buildDefaultVehicles();}
+}
+function clearSaved(){['ift5_roster','ift5_cnames','ift5_vehicles'].forEach(k=>localStorage.removeItem(k));buildDefaultRoster();buildDefaultVehicles();renderRoster();renderVehicles();toast('Reset to defaults');}
+function buildDefaultRoster(){roster=DEFAULT_USERS.map((u,i)=>({id:nextId+i,name:u.name,zone:u.zone,type:u.type,status:u.status,days:[1,1,1,1,1,1,1]}));nextId+=DEFAULT_USERS.length;}
+function buildDefaultVehicles(){vehicles=DEFAULT_VEHICLES.map((v,i)=>({...v,id:200+i}));}
+function clearTravelCache(){travelCache={};distCache={};try{localStorage.removeItem('ift5_tcache');localStorage.removeItem('ift5_distcache');}catch(e){}updateCacheCount();toast('All travel caches cleared');}
+function updateCacheCount(){const n=Object.keys(travelCache).length;const d=Object.keys(distCache).length;const el=document.getElementById('cacheCount');if(el)el.textContent=n+' base→pickup cached · '+d+' in-trip/transit cached';}
+
+// FILE HANDLING
+function handleFileDrop(ev,type){ev.preventDefault();const f=ev.dataTransfer?.files?.[0];if(f)processFile(f,type);['fileTrips','fileUsers','fileVeh','fileHistory','fileSched'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function handleFile(inp,type){if(inp.files[0]){processFile(inp.files[0],type);inp.value='';}}
+function processFile(file,type){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true,dateNF:'yyyy-mm-dd'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+      if(type==='trips'){parseTrips(raw);toast('Loaded '+file.name+' - '+tripsData.length+' trips');}
+      else if(type==='users'){parseUsers(raw);renderRoster();toast('Loaded crew - '+roster.length+' employees');}
+      else if(type==='vehicles'){parseVehicles(raw);renderVehicles();toast('Loaded vehicles - '+vehicles.length+' vehicles');}
+      else if(type==='history'){parseHistoricalTrips(raw);toast('Loaded '+file.name+' - '+historicalTrips.length+' historic trips');}
+      else if(type==='schedule'){parseSchedule(raw);}
+    }catch(err){
+      const msg=err?.message||'Unknown error';
+      const friendly = /Bad uncompressed size|invalid signature|Corrupt ZIP|Invalid zip/.test(msg)
+        ? 'The Excel file appears corrupted or unsupported. Try re-saving it as .xlsx or .xls and upload again.'
+        : msg;
+      toast('Error: '+friendly,'err');
+      console.error('XLSX parse error', err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function get(r,...keys){for(const k of keys){const v=r[k];if(v!==undefined&&v!=='')return String(v).trim();}return '';}
+// Like get() but returns raw value WITHOUT stringifying — needed for Date/number Excel cells.
+// XLSX cellDates:true produces Date objects; get() would convert them to unrecognisable strings.
+function getCell(r,...keys){for(const k of keys){const v=r[k];if(v!==undefined&&v!=='')return v;}return '';}
+function normalizeZone(zone){
+  if(!zone) return '';
+  const z=String(zone).trim().toUpperCase().replace(/\./g,'').replace(/,\s*/g,' ');
+  if(z.includes('SAN JOSE')||z==='SJ'||z==='SJC'||z.startsWith('SJ ')) return 'SANTA CLARA';
+  if(z.includes('SANTA CLARA')||z==='SC'||z.startsWith('SC ')) return 'SANTA CLARA';
+  if(z.includes('SACRAMENTO')||z==='SAC'||z.startsWith('SAC ')) return 'SACRAMENTO';
+  return z;
+}
+function parseDayFlag(value){
+  if(value===undefined||value===null) return 0;
+  if(typeof value==='boolean') return value?1:0;
+  if(typeof value==='number') return value!==0?1:0;
+  const s=String(value).trim().toLowerCase();
+  if(!s) return 0;
+  if(/^(1|yes|y|true|x|on)$/i.test(s)) return 1;
+  if(/^(0|no|n|false|off)$/i.test(s)) return 0;
+  if(/^(mon|monday|m)$/i.test(s)) return 1;
+  if(/^(tue|tues|tuesday|t)$/i.test(s)) return 1;
+  if(/^(wed|wednesday|w)$/i.test(s)) return 1;
+  if(/^(thu|thur|thurs|thursday)$/i.test(s)) return 1;
+  if(/^(fri|friday|f)$/i.test(s)) return 1;
+  if(/^(sat|saturday|sa)$/i.test(s)) return 1;
+  if(/^(sun|sunday|su)$/i.test(s)) return 1;
+  if(/^[01]{7}$/.test(s)) return s[0]==='1'?1:0;
+  return 0;
+}
+function normalizeStatus(status){
+  if(status===undefined||status===null||String(status).trim()==='') return 'Active';
+  const s=String(status).trim().toLowerCase();
+  if(/^(active|working|available|yes|y|on|ok|true)$/i.test(s)) return 'Active';
+  if(/^(inactive|off|no|n|absent|sick|leave|vacation|vacant|unavailable)$/i.test(s)) return 'Inactive';
+  return 'Active';
+}
+function normalizeCrewType(type){
+  if(!type) return 'Non-EMT';
+  const t=String(type).trim().toUpperCase();
+  if(t.includes('NON')) return 'Non-EMT';
+  if(t.includes('RN')||t.includes('NURSE')) return 'RN';
+  if(t.includes('EMT')||t.includes('PARAMEDIC')||t.includes('MEDIC')) return 'EMT';
+  return 'Non-EMT';
+}
+function parseDaysFromRow(r){
+  const dayKeys=[
+    ['Mon','Monday','MON','MONDAY'],
+    ['Tue','Tues','Tuesday','TUE','TUES','TUESDAY'],
+    ['Wed','Wednesday','WED','WEDNESDAY'],
+    ['Thu','Thur','Thurs','Thursday','THU','THUR','THURS','THURSDAY'],
+    ['Fri','Friday','FRI','FRIDAY'],
+    ['Sat','Saturday','SAT','SATURDAY'],
+    ['Sun','Sunday','SUN','SUNDAY'],
+  ];
+  const days = dayKeys.map(keys => parseDayFlag(get(r,...keys)));
+  if(days.some(d => d!==0)) return days;
+  const workingDays = get(r,'Working Days','Work Days','Days','Availability','Available Days');
+  if(workingDays){
+    const tokens = String(workingDays).trim().split(/[,;|\s]+/).filter(Boolean);
+    const out=[0,0,0,0,0,0,0];
+    const dayIndex={mon:0,monday:0,m:0,tue:1,tues:1,tuesday:1,t:1,wed:2,wednesday:2,w:2,thu:3,thur:3,thurs:3,thursday:3,fri:4,friday:4,f:4,sat:5,saturday:5,sa:5,sun:6,sunday:6,su:6};
+    tokens.forEach(tok=>{
+      const token = String(tok).trim().replace(/\.+$/,'').toLowerCase();
+      if(/^[01]{7}$/.test(token)){
+        token.split('').forEach((ch,i)=>{out[i]=ch==='1'?1:0;});
+        return;
+      }
+      if(token==='weekdays'){out.fill(1,0,5);return;}
+      if(token==='weekends'){out[5]=1;out[6]=1;return;}
+      if(token.includes('-')){
+        const parts=token.split('-').map(p=>p.trim());
+        const start = dayIndex[parts[0]];
+        const end = dayIndex[parts[1]];
+        if(start!==undefined && end!==undefined){
+          for(let i=start;; i=(i+1)%7){out[i]=1; if(i===end) break;}
+          return;
+        }
+      }
+      const idx = dayIndex[token];
+      if(idx!==undefined){ out[idx]=1; }
+    });
+    if(out.some(x=>x)) return out;
+  }
+  return [1,1,1,1,1,1,1];
+}
+function parseUsers(raw){
+  const parsed=raw.filter(r=>get(r,'Name','name','Full Name','FullName','Crew Name','Employee','Employee Name')).map((r,i)=>({
+    id:nextId+i,name:get(r,'Name','name','Full Name','FullName','Crew Name','Employee','Employee Name'),
+    zone:normalizeZone(get(r,'Zone','zone','Location Setup','Location','Base','Work Zone','Region','Work Location')),
+    type:normalizeCrewType(get(r,'User Group','Type','type','UserGroup','Role','Role Name','Position','Job')),
+    status:normalizeStatus(get(r,'Status','status','Employment Status','Active','Availability')),
+    days:parseDaysFromRow(r)
+  }));
+  const dropped = raw.length - parsed.length;
+  if(dropped){
+    console.warn('parseUsers loaded '+parsed.length+' rows and dropped '+dropped+' rows because Name was missing or unrecognized.');
+    toast('Warning: '+dropped+' crew rows skipped because Name was missing','warn');
+  }
+  roster=parsed;
+  nextId+=roster.length;saveRoster();
+}
+function parseVehicles(raw){
+  vehicles=raw.filter(r=>get(r,'Vehicle Name','Name','name')).map((r,i)=>{
+    const nm=get(r,'Vehicle Name','Name','name');
+    let type=get(r,'Vehicle Type','Type','type');
+    if(!type){if(nm.startsWith('GW'))type='Gurney Van';else if(nm.startsWith('WC'))type='Wheelchair Van';else if(nm.startsWith('M'))type='Ambulance';else type='Unknown';}
+    const loc=normalizeZone(get(r,'Location','Zone','Base','location'));
+    const bar=get(r,'Bariatric Capable','Bariatric','bariatric').toLowerCase();
+    return{id:300+i,name:nm,plate:get(r,'Plate Number','Plate','plate'),type,status:get(r,'Vehicle Status','Status','status')||'In-Service',location:loc,bariatric:bar==='true'||bar==='yes'||bar==='1'};
+  });
+  saveVehicles();
+}
+function normName(n){return String(n||'').trim().toUpperCase().replace(/\s+/g,' ');}
+
+function parseSchedule(raw){
+  scheduleData={};
+  let count=0;
+  raw.forEach(r=>{
+    // getCell preserves Date objects from Excel; get() would stringify them unrecognisably
+    const vehicle    =get(r,'Shift Name','Unit','Vehicle','Rig','shift_name');
+    const dateStr    =excelDateToStr(getCell(r,'Shift Date','Date','shift_date'));
+    const startRaw   =getCell(r,'Start Time','start_time','StartTime');
+    const endRaw     =getCell(r,'End Time','end_time','EndTime');
+    const zone       =normalizeZone(get(r,'Shift Location','Location','Zone','Base','shift_location'));
+    const personalRaw=get(r,'Assigned Personal','Crew','Personnel','Staff','assigned_personal');
+    const los        =normLOS(get(r,'Level Of Service','LOS','los','Level of Service','Service'));
+    if(!dateStr||!vehicle||!personalRaw)return;
+    const shiftStart=toMins(normaliseTime(startRaw));
+    const shiftEnd  =toMins(normaliseTime(endRaw));
+    // Handle "Rahman Mohammad, Muzill Izmarai" or "Jason / Pierce" or single name
+    const names=personalRaw.split(/[,\/]/).map(n=>n.trim()).filter(Boolean);
+    if(!scheduleData[dateStr])scheduleData[dateStr]=[];
+    scheduleData[dateStr].push({vehicle,shiftStart,shiftEnd,zone,names,los});
+    count++;
+  });
+  // Build per-employee windows keyed by "name|zone"
+  Object.keys(scheduleData).filter(k=>!k.includes('_windows')).forEach(date=>{
+    scheduleData[date+'_windows']={};
+    scheduleData[date].forEach(entry=>{
+      const lunch=entry.shiftStart+4*60+30;
+      entry.names.forEach(name=>{
+        const k=name+'|'+entry.zone;
+        if(!scheduleData[date+'_windows'][k])
+          scheduleData[date+'_windows'][k]={start:entry.shiftStart,end:entry.shiftEnd,lunch,vehicle:entry.vehicle};
+      });
+    });
+  });
+  const days=Object.keys(scheduleData).filter(k=>!k.includes('_windows')).length;
+  const empWindows=Object.keys(scheduleData).filter(k=>!k.includes('_windows'))
+    .reduce((n,d)=>n+(scheduleData[d+'_windows']?Object.keys(scheduleData[d+'_windows']).length:0),0);
+  toast('Schedule loaded — '+count+' shifts \u00b7 '+empWindows+' crew windows \u00b7 '+days+' day(s)');
+  runAllMappings();
+}
+
+function findRosterMatch(name){
+  const norm=normName(name);
+  // 1. Exact normalised match
+  let m=roster.find(e=>normName(e.name)===norm);
+  if(m)return m;
+  // 2. Last-name-only match when unambiguous (e.g. schedule "Davis" vs roster "Joseph Davis")
+  const last=norm.split(' ').pop();
+  const by_last=roster.filter(e=>normName(e.name).split(' ').pop()===last);
+  if(by_last.length===1)return by_last[0];
+  // 3. Contains-first-and-last: handles "J. Davis" vs "Joseph Davis"
+  const parts=norm.split(' ');
+  if(parts.length>=2){
+    const fl=parts[0][0], ll=parts[parts.length-1];
+    const fl_last=roster.filter(e=>{
+      const ep=normName(e.name).split(' ');
+      return ep[0]&&ep[0][0]===fl&&ep[ep.length-1]===ll;
+    });
+    if(fl_last.length===1)return fl_last[0];
+  }
+  return null;
+}
+
+function applyScheduleForDate(date){
+  const entries=scheduleData[date];
+  if(!entries?.length)return null;
+  const newRoster=[];
+  let id=nextId+500; // offset to avoid collision with roster IDs
+  entries.forEach(entry=>{
+    // For multi-person rows, keep known EMT crews together as EMT-only.
+    // This prevents accidental EMT/Non-EMT splits for pre-defined crews like M23.
+    const los=entry.los||'';
+    const matchesByName={};
+    entry.names.forEach(n=>{matchesByName[n]=findRosterMatch(n);});
+    const matchedTypes=Object.values(matchesByName).filter(Boolean).map(m=>m.type);
+    const hasMatchedEMT=matchedTypes.includes('EMT');
+    const hasMatchedRN=matchedTypes.includes('RN');
+    const lockAsEMT=entry.names.length>=2&&!hasMatchedRN&&(los==='BLS'||los==='ALS'||hasMatchedEMT);
+    entry.names.forEach(name=>{
+      const existing=matchesByName[name];
+      // Infer crew type: prefer roster, then schedule LOS, then default Non-EMT
+      let type='Non-EMT';
+      if(existing){
+        type=existing.type;
+      } else {
+        if(los==='BLS'||los==='ALS'||los==='CCT')type='EMT';
+        else if(los==='RN')type='RN';
+      }
+      if(lockAsEMT&&type!=='RN')type='EMT';
+      newRoster.push({
+        id:id++,
+        name,
+        zone:entry.zone,
+        type,
+        status:'Active',
+        days:[1,1,1,1,1,1,1],
+        schedPinned:true,
+        hbShiftStart:entry.shiftStart, // reused so active check (hbShiftStart!==undefined) works
+      });
+    });
+  });
+  return newRoster;
+}
+
+function parseTrips(raw){
+  const parsed=raw.map(r=>{
+    const dateStr=excelDateToStr(get(r,'Pickup Date','pickup_date','PickupDate','Trip Date','trip_date','Date'));
+    const los=normLOS(get(r,'Level Of Service','LOS','los','Service Type','Service','Case Type','Transport Type','Trip Type'));
+    const zone=normalizeZone(get(r,'Zone','zone','Base','Region','Location','Trip Zone','Service Area','Area'));
+    const pickup=normaliseTime(get(r,'Pickup Time','Pickup time','pickup','Time','Start Time','PickupTime'));
+    const auth=get(r,'Auth No','auth','Auth','Authorization','Order No','Order Number','Trip No','Trip Number');
+    const wr=String(get(r,'Wait & Return','WR','Wait Return','WaitReturn','Wait and Return')).trim().toUpperCase();
+    const specEq=get(r,'Special Equipment','Special_Equipment','special_equipment','Equipment','Equip');
+    const patientRaw=get(r,'Patient Information','Patient','patient_name','Patient Name','PatientName','Client','Client Name');
+    const patient=patientRaw?cleanName(patientRaw):'';
+    const dobRaw=get(r,'DOB','Date of Birth','Birth Date','Patient DOB','Date of Birth','Patient_DOB','dob');
+    const patientDob=dobRaw?parseDob(dobRaw):parseDob(patientRaw);
+    const travelRaw=get(r,'Min of Travel','MinOfTravel','min_of_travel','Travel Minutes','Travel Time');
+    const travelMins=parseTravelMins(travelRaw);
+    const pickupAddr=get(r,'Pickup Address','Pickup_Address','pickup_address','Origin','From Address','From');
+    const dropoffAddr=get(r,'Drop-off Address','Dropoff Address','dropoff_address','Drop_off_Address','Destination','To Address','To');
+    const estTransRaw=get(r,'Est. Min of Transport','Est Min of Transport','est_min_of_transport','Est Transport','Estimated Transport');
+    const estTransport=estTransRaw&&estTransRaw!=='nan'?parseFloat(estTransRaw):null;
+    const patientKey = patient.trim().toUpperCase().replace(/\s+/g,' ');
+    const patientId = patientKey && patientDob ? patientKey+'|'+patientDob : patientKey;
+    return{auth,zone,los,pickup,pickupMins:toMins(pickup),date:dateStr,isWR:/^(YES|Y|WR|WAIT|WAIT & RETURN|WAIT AND RETURN)$/.test(wr),specialEquip:specEq&&specEq!=='NaN'?specEq:'',patient,patientDob,patientId,travelMins,pickupAddr,dropoffAddr,estTransport};
+  });
+  const filtered=parsed.filter(t=>t.date&&t.los&&t.zone&&t.pickup);
+  const dropped = parsed.length - filtered.length;
+  if(dropped){
+    console.warn('parseTrips dropped '+dropped+' rows because required date/LOS/zone/pickup values were missing or unrecognized.');
+    toast('Warning: '+dropped+' trip rows skipped due to missing required fields','warn');
+  }
+  tripsData=filtered;
+  allDates=[...new Set(tripsData.map(t=>t.date))].sort();
+  manualOverrides={};
+  if(activeDate!=='all'&&!allDates.includes(activeDate)) activeDate='all';
+  updateDateUI();runAllMappings();
+}
+function parseHistoricalTrips(raw){
+  historicalTrips=raw.map(r=>{
+    const dateStr=excelDateToStr(get(r,'Pickup Date','pickup_date','PickupDate'));
+    const los=normLOS(get(r,'Level Of Service','LOS','los'));
+    const zone=get(r,'Zone','zone').toUpperCase().replace('SAN JOSE','SANTA CLARA');
+    const pickup=normaliseTime(get(r,'Pickup Time','Pickup time','pickup'));
+    const wr=get(r,'Wait & Return','WR').toUpperCase();
+    const specEq=get(r,'Special Equipment','Special_Equipment','special_equipment');
+    const travelRaw=get(r,'Min of Travel','MinOfTravel','min_of_travel');
+    const travelMins=parseTravelMins(travelRaw);
+    return{
+      zone,
+      los,
+      date:dateStr,
+      weekday:dowIndex(dateStr),
+      pickup,
+      pickupMins:toMins(pickup),
+      isWR:wr==='WAIT & RETURN'||wr==='YES',
+      specialEquip:specEq&&specEq!=='NaN'?specEq:'',
+      travelMins,
+    };
+  }).filter(t=>t.date&&t.los&&t.zone&&t.pickup);
+  updateHistoricalDemand();
+}
+function zohoParseResponse(data){
+  if(!data) return [];
+  if(Array.isArray(data)) return data;
+  if(data.data && Array.isArray(data.data)) return data.data;
+  if(data.response?.result && Array.isArray(data.response.result)) return data.response.result;
+  if(data.result && Array.isArray(data.result)) return data.result;
+  if(data.data?.records && Array.isArray(data.data.records)) return data.data.records;
+  return [];
+}
+async function zohoFetch(url){
+  if(!url) throw new Error('Zoho API URL not configured');
+  const headers={};
+  const token=settings.zohoApiToken;
+  if(token){
+    if(settings.zohoAuthType==='API Key'){
+      headers['x-api-key']=token;
+    } else if(settings.zohoAuthType==='Bearer'){
+      headers['Authorization']='Bearer '+token;
+    } else if(settings.zohoAuthType==='Zoho'){
+      headers['Authorization']='Zoho-oauthtoken '+token;
+    }
+  }
+  const targetUrl = buildZohoUrl(url);
+  if(!/^https?:\/\//i.test(targetUrl)){
+    throw new Error('Zoho API URL must be a full URL starting with https://');
+  }
+  const fetchUrl = ZOHO_PROXY_BASE + encodeURIComponent(targetUrl);
+  const resp = await fetch(fetchUrl,{headers});
+  if(!resp.ok){
+    const body=await resp.text();
+    throw new Error('Zoho fetch failed '+resp.status+': '+body.slice(0,200));
+  }
+  return resp.json();
+}
+async function syncZohoTrips(){
+  if(!settings.zohoApiUrl){toast('Enter Zoho API URL in Settings','warn');return;}
+  try{
+    toast('Fetching Zoho trip data...');
+    const data=await zohoFetch(settings.zohoApiUrl);
+    const rows=zohoParseResponse(data);
+    if(!rows.length){toast('Zoho returned no records','warn');return;}
+    parseTrips(rows);
+    toast('Zoho trips loaded: '+tripsData.length);
+  }catch(e){toast('Zoho error: '+e.message,'err');}
+}
+async function syncZohoHistory(){
+  if(!settings.zohoApiUrl){toast('Enter Zoho API URL in Settings','warn');return;}
+  try{
+    toast('Fetching Zoho historic data...');
+    const data=await zohoFetch(settings.zohoApiUrl);
+    const rows=zohoParseResponse(data);
+    if(!rows.length){toast('Zoho returned no historic records','warn');return;}
+    parseHistoricalTrips(rows);
+    renderForecast();
+    toast('Zoho historic data loaded: '+historicalTrips.length);
+  }catch(e){toast('Zoho error: '+e.message,'err');}
+}
+
+function formatDateForZoho(value){
+  if(!value) return '';
+  const d=new Date(value);
+  if(isNaN(d)) return value;
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const yyyy=String(d.getFullYear());
+  return mm+'/'+dd+'/'+yyyy;
+}
+
+function buildZohoUrl(url){
+  try{
+    const u=new URL(url);
+    if(settings.zohoDateFrom) u.searchParams.set('dateFrom', formatDateForZoho(settings.zohoDateFrom));
+    if(settings.zohoDateTo) u.searchParams.set('dateTo', formatDateForZoho(settings.zohoDateTo));
+    if(settings.zohoAuthType==='API Key Query' && settings.zohoApiToken){
+      u.searchParams.set('publickey', settings.zohoApiToken);
+    }
+    return u.toString();
+  }catch(e){
+    throw new Error('Zoho API URL must be a valid full URL starting with https://. Use the endpoint URL here and paste the public key into the token field.');
+  }
+}
+function updateHistoricalDemand(){
+  historicalDemand={};
+  historicalTrips.forEach(t=>{
+    const wd=t.weekday;
+    const hour=Math.floor(t.pickupMins/60);
+    historicalDemand[wd]=historicalDemand[wd]||{};
+    historicalDemand[wd][hour]=historicalDemand[wd][hour]||{};
+    historicalDemand[wd][hour][t.zone]=historicalDemand[wd][hour][t.zone]||{};
+    historicalDemand[wd][hour][t.zone][t.los]=(historicalDemand[wd][hour][t.zone][t.los]||0)+1;
+  });
+}
+function getForecastForDate(date){
+  const wd=dowIndex(date);
+  const data=historicalDemand[wd]||{};
+  const rows=[];
+  Object.entries(data).sort((a,b)=>a[0]-b[0]).forEach(([hour,zones])=>{
+    Object.entries(zones).forEach(([zone,losData])=>{
+      const total=Object.values(losData).reduce((sum,v)=>sum+v,0);
+      rows.push({hour:Number(hour),zone,losData,total});
+    });
+  });
+  return rows;
+}
+function getCoverageRecommendation(rows){
+  const coverage={};
+  rows.forEach(r=>{
+    const zone=r.zone;
+    coverage[zone]=coverage[zone]||{NonEMT:0,EMT:0,RN:0};
+    Object.entries(r.losData).forEach(([los,count])=>{
+      const rule=LOS_RULES[los];
+      if(!rule)return;
+      coverage[zone].NonEMT += (rule.ne||0)*count;
+      coverage[zone].EMT += (rule.emt||0)*count;
+      coverage[zone].RN += (rule.rn||0)*count;
+    });
+  });
+  return coverage;
+}
+function renderForecast(){
+  const con=document.getElementById('forecast-content');
+  if(!historicalTrips.length){con.innerHTML='<div class="empty">Upload historic trips in the top bar to enable demand forecasting</div>';return;}
+  const fallbackDate=new Date().toISOString().slice(0,10);
+  const date=activeDate==='all'?(allDates[0]||fallbackDate):activeDate;
+  const rows=getForecastForDate(date);
+  if(!rows.length){con.innerHTML='<div class="empty">No forecast data available for this weekday</div>';return;}
+  const coverage=getCoverageRecommendation(rows);
+  let html='<div class="summary-bar">';
+  Object.entries(coverage).forEach(([zone,vals])=>{
+    html+='<div class="sum-card"><div class="sum-label">'+zone+' Coverage</div>'
+      +'<div class="sum-val c-green">'+vals.NonEMT+'</div>'
+      +'<div class="sum-sub">Non-EMT</div>'
+      +'<div class="sum-val c-purple">'+vals.EMT+'</div>'
+      +'<div class="sum-sub">EMT</div>'
+      +'<div class="sum-val c-teal">'+vals.RN+'</div>'
+      +'<div class="sum-sub">RN</div></div>';
+  });
+  html+='</div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--muted)">Forecast for '+date+' based on historic weekday demand. Each hour row is a predicted trip count by zone. The coverage estimates show the minimum crew counts suggested by historical demand and LOS crew rules.</div>';
+  html+='<table><thead><tr><th>Hour</th><th>Zone</th><th>Trips</th><th>LOS Counts</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const losText=Object.entries(r.losData).map(([los,c])=>los+': '+c).join('<br>');
+    html+='<tr><td style="font-family:var(--mono);">'+String(r.hour).padStart(2,'0')+':00</td><td>'+r.zone+'</td><td>'+r.total+'</td><td>'+losText+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  con.innerHTML=html;
+}
+function cleanName(s){return s.replace(/\s+\d{2}\/\d{2}\/\d{4}$/,'').replace(/\d{2}\/\d{2}\/\d{4}/g,'').trim()||'--';}
+function parseDob(v){
+  if(v===undefined||v===null||v==='')return '';
+  if(v instanceof Date){
+    if(isNaN(v.getTime()))return '';
+    return v.toISOString().slice(0,10);
+  }
+  const raw=String(v).trim();
+  const match=raw.match(/(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/);
+  if(match){
+    const d=new Date(match[1].replace(/-/g,'/'));
+    if(!isNaN(d.getTime())) return d.toISOString().slice(0,10);
+  }
+  const d=new Date(raw);
+  if(!isNaN(d.getTime())) return d.toISOString().slice(0,10);
+  return raw.replace(/\s+/g,' ').trim().toUpperCase();
+}
+function parseTravelMins(v){if(!v||v==='')return null;const m=String(v).match(/(\d+)/);return m?parseInt(m[1]):null;}
+
+// GOOGLE DISTANCE API
+let mapsApiLoaded=false;
+let mapsApiLoading=false;
+let mapsApiCallbacks=[];
+
+function loadMapsApi(){
+  return new Promise((resolve,reject)=>{
+    if(mapsApiLoaded){resolve();return;}
+    mapsApiCallbacks.push({resolve,reject});
+    if(mapsApiLoading)return;
+    mapsApiLoading=true;
+    window.__mapsReady=()=>{
+      mapsApiLoaded=true;mapsApiLoading=false;
+      mapsApiCallbacks.forEach(cb=>cb.resolve());
+      mapsApiCallbacks=[];
+    };
+    const k=settings.apiKey;
+    if(!k){mapsApiCallbacks.forEach(cb=>cb.reject(new Error('No API key')));mapsApiCallbacks=[];mapsApiLoading=false;return;}
+    const old=document.getElementById('gmaps-script');if(old)old.remove();
+    const s=document.createElement('script');
+    s.id='gmaps-script';
+    s.async=true;
+    s.defer=true;
+    s.src='https://maps.googleapis.com/maps/api/js?key='+k+'&callback=__mapsReady&libraries=places,routes';
+    s.onerror=()=>{mapsApiCallbacks.forEach(cb=>cb.reject(new Error('Script load failed')));mapsApiCallbacks=[];mapsApiLoading=false;};
+    document.head.appendChild(s);
+  });
+}
+
+async function getTravelTime(zone,addr){
+  if(!settings.apiKey||!addr)return null;
+  const origin=zone==='SACRAMENTO'?settings.sacAddress:settings.scAddress;
+  if(!origin)return null;
+  const cacheKey=zone+'|'+addr;
+  if(travelCache[cacheKey]!==undefined)return travelCache[cacheKey];
+  try{
+    await loadMapsApi();
+    const mins=await new Promise((resolve,reject)=>{
+      if (google.maps.routes?.RouteMatrixService) {
+        const svc=new google.maps.routes.RouteMatrixService();
+        svc.computeRouteMatrix({
+          origins:[{location:origin}],
+          destinations:[{location:addr}],
+          travelMode:google.maps.TravelMode.DRIVING,
+          routingPreference:google.maps.RoutingPreference.BALANCED,
+        },(resp,status)=>{
+          if(status==='OK'){
+            const secs=resp?.rows?.[0]?.elements?.[0]?.duration?.value;
+            resolve(secs?Math.ceil(secs/60):null);
+          } else {
+            reject(new Error('Route Matrix status: '+status));
+          }
+        });
+      } else {
+        const svc=new google.maps.DistanceMatrixService();
+        svc.getDistanceMatrix({
+          origins:[origin],
+          destinations:[addr],
+          travelMode:google.maps.TravelMode.DRIVING,
+          unitSystem:google.maps.UnitSystem.IMPERIAL,
+        },(resp,status)=>{
+          if(status==='OK'){
+            const secs=resp?.rows?.[0]?.elements?.[0]?.duration?.value;
+            resolve(secs?Math.ceil(secs/60):null);
+          }else{
+            reject(new Error('Distance Matrix status: '+status));
+          }
+        });
+      }
+    });
+    travelCache[cacheKey]=mins;
+    try{localStorage.setItem('ift5_tcache',JSON.stringify(travelCache));}catch(e){}
+    updateCacheCount();
+    return mins;
+  }catch(e){
+    console.warn('getTravelTime error:',e.message);
+    return null;
+  }
+}
+
+async function testApiKey(){
+  const key=document.getElementById('googleApiKey')?.value;
+  if(!key){toast('Enter API key first','warn');return;}
+  settings.apiKey=key;
+  mapsApiLoaded=false;mapsApiLoading=false;mapsApiCallbacks=[];
+  const old=document.getElementById('gmaps-script');if(old)old.remove();
+  const t=await getTravelTime('SACRAMENTO','Sacramento, CA');
+  if(t!==null)toast('API key works - test travel: '+t+' min');
+  else toast('API key failed or address missing - check key and base addresses','err');
+}
+
+let distCache={}; 
+async function getInTripTime(pickupAddr, dropoffAddr){
+  if(!pickupAddr||!dropoffAddr)return null;
+  const k='inTrip '+pickupAddr+' '+dropoffAddr;
+  if(distCache[k]!==undefined)return distCache[k];
+  if(!settings.apiKey)return null;
+  try{
+    await loadMapsApi();
+    const mins=await new Promise((res,rej)=>{
+      if (google.maps.routes?.RouteMatrixService) {
+        new google.maps.routes.RouteMatrixService().computeRouteMatrix({
+          origins:[{location:pickupAddr}],
+          destinations:[{location:dropoffAddr}],
+          travelMode:google.maps.TravelMode.DRIVING,
+          routingPreference:google.maps.RoutingPreference.BALANCED,
+        },(resp,st)=>{
+          if(st==='OK'){const s=resp?.rows?.[0]?.elements?.[0]?.duration?.value;res(s?Math.ceil(s/60):null);}
+          else rej(new Error(st));
+        });
+      } else {
+        new google.maps.DistanceMatrixService().getDistanceMatrix({
+          origins:[pickupAddr],destinations:[dropoffAddr],
+          travelMode:google.maps.TravelMode.DRIVING,
+          unitSystem:google.maps.UnitSystem.IMPERIAL,
+        },(resp,st)=>{
+          if(st==='OK'){const s=resp?.rows?.[0]?.elements?.[0]?.duration?.value;res(s?Math.ceil(s/60):null);}
+          else rej(new Error(st));
+        });
+      }
+    });
+    distCache[k]=mins;
+    try{localStorage.setItem('ift5_distcache',JSON.stringify(distCache));}catch(e){}
+    return mins;
+  }catch(e){return null;}
+}
+
+async function getInterTripTransit(dropoffAddr, nextPickupAddr){
+  if(!dropoffAddr||!nextPickupAddr)return null;
+  const k='transit '+dropoffAddr+' '+nextPickupAddr;
+  if(distCache[k]!==undefined)return distCache[k];
+  if(!settings.apiKey)return null;
+  try{
+    await loadMapsApi();
+    const mins=await new Promise((res,rej)=>{
+      if (google.maps.routes?.RouteMatrixService) {
+        new google.maps.routes.RouteMatrixService().computeRouteMatrix({
+          origins:[{location:dropoffAddr}],
+          destinations:[{location:nextPickupAddr}],
+          travelMode:google.maps.TravelMode.DRIVING,
+          routingPreference:google.maps.RoutingPreference.BALANCED,
+        },(resp,st)=>{
+          if(st==='OK'){const s=resp?.rows?.[0]?.elements?.[0]?.duration?.value;res(s?Math.ceil(s/60):null);}
+          else rej(new Error(st));
+        });
+      } else {
+        new google.maps.DistanceMatrixService().getDistanceMatrix({
+          origins:[dropoffAddr],destinations:[nextPickupAddr],
+          travelMode:google.maps.TravelMode.DRIVING,
+          unitSystem:google.maps.UnitSystem.IMPERIAL,
+        },(resp,st)=>{
+          if(st==='OK'){const s=resp?.rows?.[0]?.elements?.[0]?.duration?.value;res(s?Math.ceil(s/60):null);}
+          else rej(new Error(st));
+        });
+      }
+    });
+    distCache[k]=mins;
+    try{localStorage.setItem('ift5_distcache',JSON.stringify(distCache));}catch(e){}
+    return mins;
+  }catch(e){return null;}
+}
+
+function computeBlock(trip, nextPickupAddr){
+  if(trip.isWR)return WR_BLOCK;
+  const transitKey='transit '+trip.dropoffAddr+' '+nextPickupAddr;
+  const transit = nextPickupAddr?(distCache[transitKey]??15):0;
+  return Math.max(COMPLETION_MINUTES + transit, COMPLETION_MINUTES);
+}
+
+function fallbackBlock(trip){
+  if(trip.isWR && trip.isWrMaster) return WR_BLOCK;
+  return COMPLETION_MINUTES + 15;
+}
+
+async function preFetchDistances(trips){
+  if(!settings.apiKey)return;
+  const pairs=new Set();
+  const basePairs=new Set();
+  trips.forEach(t=>{
+    if(t.pickupAddr&&t.dropoffAddr) pairs.add('inTrip '+t.pickupAddr+' '+t.dropoffAddr);
+    if(t.zone&&t.pickupAddr) basePairs.add(t.zone+'|'+t.pickupAddr);
+  });
+  const byZone={};
+  trips.forEach(t=>{byZone[t.zone]=byZone[t.zone]||[];byZone[t.zone].push(t);});
+  Object.values(byZone).forEach(zTrips=>{
+    zTrips.sort((a,b)=>a.pickupMins-b.pickupMins).forEach((t,i)=>{
+      const next=zTrips[i+1];
+      if(next&&t.dropoffAddr&&next.pickupAddr) pairs.add('transit '+t.dropoffAddr+' '+next.pickupAddr);
+    });
+  });
+  const uncached=[...pairs].filter(k=>distCache[k]===undefined);
+  const uncachedBase=[...basePairs].filter(k=>travelCache[k]===undefined);
+  if(!uncached.length&&!uncachedBase.length)return;
+  toast('Fetching '+(uncached.length+uncachedBase.length)+' drive times...');
+  for(const key of uncached){
+    const parts=key.split(' ');
+    if(parts[0]==='inTrip') await getInTripTime(parts[1],parts[2]);
+    else await getInterTripTransit(parts[1],parts[2]);
+    await new Promise(r=>setTimeout(r,80));
+  }
+  for(const key of uncachedBase){
+    const [zone,addr]=key.split('|');
+    await getTravelTime(zone,addr);
+    await new Promise(r=>setTimeout(r,80));
+  }
+  toast('Drive times loaded — re-running mapping');
+  runMappingsSilent();
+}
+
+// HOMEBASE INTEGRATION
+const HB_BASE = (typeof window !== 'undefined' && window.location.protocol === 'file:')
+  ? 'http://localhost:3000/proxy/homebase'
+  : '/proxy/homebase';
+const ZOHO_PROXY_BASE = (typeof window !== 'undefined' && window.location.protocol === 'file:')
+  ? 'http://localhost:3000/proxy/zoho?target='
+  : '/proxy/zoho?target=';
+const HB_ACCEPT='application/vnd.homebase-v1+json';
+
+function roleToType(role){
+  if(!role)return 'Non-EMT';
+  const r=role.toUpperCase();
+  if(r.includes('RN')||r.includes('NURSE')||r.includes('REGISTERED'))return 'RN';
+  if(r.includes('EMT')||r.includes('PARAMEDIC')||r.includes('MEDIC'))return 'EMT';
+  if(r.includes('GURNEY VAN')||r.includes('WHEELCHAIR')||r.includes('BARIATRIC')||r.includes('NON-EMT')||r.includes('DRIVER'))return 'Non-EMT';
+  return 'Non-EMT';
+}
+
+function deriveHbZone(role, defaultZone){
+  if(!role) return defaultZone;
+  const r=role.toUpperCase().replace(/\s+/g,' ');
+  if(r.includes('SC-')||r.includes('SC ')||r.includes('SANTA CLARA')||r.includes('S C ')||r.includes('SC GURNEY VAN')) return 'SANTA CLARA';
+  if(r.includes('SAC-')||r.includes('SACRAMENTO')||r.includes('S A C ')) return 'SACRAMENTO';
+  if(r.includes('GURNEY VAN')&&r.includes('SC')) return 'SANTA CLARA';
+  if(r.includes('GURNEY VAN')) return 'SACRAMENTO';
+  if(r.includes('WHEELCHAIR')||r.includes('BARIATRIC')||r.includes('CCT')||r.includes('BLS')) {
+    return defaultZone;
+  }
+  return defaultZone;
+}
+
+async function hbFetch(path){
+  const token=settings.hbToken;
+  if(!token)throw new Error('No Homebase API token configured');
+  const resp=await fetch(HB_BASE+path,{
+    headers:{'Authorization':'Bearer '+token,'Accept':HB_ACCEPT}
+  });
+  if(!resp.ok){
+    const err=await resp.json().catch(()=>({}));
+    throw new Error('Homebase API '+resp.status+': '+(err.error||resp.statusText));
+  }
+  return resp.json();
+}
+
+async function hbFetchAll(path){
+  const sep=path.includes('?')?'&':'?';
+  let page=1,all=[];
+  while(true){
+    const resp=await fetch(HB_BASE+path+sep+'per_page=100&page='+page,{
+      headers:{'Authorization':'Bearer '+settings.hbToken,'Accept':HB_ACCEPT}
+    });
+    if(!resp.ok)throw new Error('Homebase '+resp.status);
+    const data=await resp.json();
+    const items=Array.isArray(data)?data:[data];
+    all.push(...items);
+    const total=parseInt(resp.headers.get('Total')||'0');
+    const perPage=parseInt(resp.headers.get('Per-Page')||'100');
+    if(all.length>=total||items.length<perPage)break;
+    page++;
+  }
+  return all;
+}
+
+async function hbLoadLocations(){
+  try{
+    toast('Fetching Homebase locations...');
+    const locs=await hbFetchAll('/locations');
+    const sacSel=document.getElementById('hbSacUuid');
+    const scSel =document.getElementById('hbScUuid');
+    if(!sacSel||!scSel)return;
+    const opts='<option value="">-- select --</option>'+locs.map(l=>`<option value="${l.uuid}">${l.name} (${l.city||l.zip})</option>`).join('');
+    sacSel.innerHTML=opts;scSel.innerHTML=opts;
+    if(settings.hbSacUuid)sacSel.value=settings.hbSacUuid;
+    if(settings.hbScUuid) scSel.value=settings.hbScUuid;
+    toast('Found '+locs.length+' location'+(locs.length!==1?'s':'')+' — select SAC and SC');
+  }catch(e){toast('Homebase error: '+e.message,'err');}
+}
+
+async function hbSyncForDate(dateStr){
+  if(!settings.hbToken){toast('Add Homebase token in Settings','warn');return null;}
+  const uuids=[];
+  if(settings.hbSacUuid)uuids.push({uuid:settings.hbSacUuid,zone:'SACRAMENTO'});
+  if(settings.hbScUuid) uuids.push({uuid:settings.hbScUuid,zone:'SANTA CLARA'});
+  if(!uuids.length){toast('Select location UUIDs in Settings','warn');return null;}
+
+  toast('Syncing Homebase schedule for '+dateStr+'...');
+  const dayStart=dateStr+'T00:00:00';
+  const dayEnd  =dateStr+'T23:59:59';
+
+  const scheduleEntries=[];
+  for(const {uuid,zone} of uuids){
+    try{
+      const shifts=await hbFetchAll(
+        '/locations/'+uuid+'/shifts?start_date='+encodeURIComponent(dayStart)+'&end_date='+encodeURIComponent(dayEnd)+'&date_filter=start_at'
+      );
+      const published=shifts.filter(s=>s.published&&!s.open&&s.first_name);
+      published.forEach(s=>{
+        const startMins=isoToMins(s.start_at);
+        const endMins  =isoToMins(s.end_at);
+        const entryZone = deriveHbZone(s.role||'', zone);
+        scheduleEntries.push({
+          hbId:s.user_id,
+          name:(s.first_name+' '+s.last_name).trim(),
+          zone:entryZone,
+          type:roleToType(s.role||''),
+          status:'Active',
+          days:[1,1,1,1,1,1,1],
+          hbShiftStart:startMins,
+          hbShiftEnd:endMins,
+          hbLunchStart:startMins+4*60+30,
+          role:s.role||'',
+          hbSourceZone:zone,
+        });
+      });
+    }catch(e){toast('Error fetching '+zone+': '+e.message,'err');}
+  }
+  return scheduleEntries;
+}
+
+function isoToMins(iso){
+  if(!iso)return 0;
+  const d=new Date(iso);
+  return d.getHours()*60+d.getMinutes();
+}
+
+function applyHbSchedule(date){
+  const entries=hbSchedule[date];
+  if(!entries?.length)return false;
+  const seen=new Set();
+  const newRoster=[];
+  let id=nextId;
+  entries.forEach(e=>{
+    const key=e.hbId+'|'+e.zone;
+    if(seen.has(key))return;
+    seen.add(key);
+    newRoster.push({...e,id:id++});
+  });
+  hbSchedule[date+'_windows']={};
+  entries.forEach(e=>{
+    const k=e.name+'|'+e.zone;
+    if(!hbSchedule[date+'_windows'][k]){
+      hbSchedule[date+'_windows'][k]={start:e.hbShiftStart,end:e.hbShiftEnd,lunch:e.hbLunchStart};
+    }
+  });
+  return newRoster;
+}
+
+async function syncHomebase(){
+  if(!allDates.length){toast('Upload a trip file first','warn');return;}
+  const date=activeDate==='all'?allDates[0]:activeDate;
+  const entries=await hbSyncForDate(date);
+  if(!entries){return;}
+  if(!entries.length){toast('No published shifts found on Homebase for '+date,'warn');return;}
+  hbSchedule[date]=entries;
+  const count=new Set(entries.map(e=>e.name+'|'+e.zone)).size;
+  toast('Synced '+count+' scheduled employees from Homebase');
+  runAllMappings();
+}
+
+function updateHbStatus(){
+  const el=document.getElementById('hbStatus');
+  if(!el)return;
+  if(!settings.hbToken){el.textContent='Not configured';el.style.color='var(--muted)';return;}
+  if(settings.hbEnabled){el.textContent='Enabled — schedules pulled from Homebase';el.style.color='var(--green)';}
+  else{el.textContent='Token saved · Enable toggle to use Homebase for mapping';el.style.color='var(--yellow)';}
+}
+
+function calcShiftStart(pm,travel){
+  // Fixed 1-hour head start before first pickup.
+  // Crew preps and departs so they arrive 1 hr before the trip — regardless of drive time.
+  return pm-PREP_MAX;
+}
+function calcLunchStart(ss){return ss+4*60+30;}
+
+let vehShiftMap={};
+function resetVehSession(){vehShiftMap={};}
+
+function isVehFreeForShift(vname,shiftStart,shiftEnd,owner){
+  return !(vehShiftMap[vname]||[]).some(w=>w.owner!==owner && shiftStart<w.shiftEnd&&shiftEnd>w.shiftStart);
+}
+function claimVehForShift(vname,shiftStart,shiftEnd,owner){
+  if(!vehShiftMap[vname])vehShiftMap[vname]=[];
+  vehShiftMap[vname].push({shiftStart,shiftEnd,owner});
+}
+
+function normVehType(type){
+  return String(type||'').trim().toLowerCase().replace(/\s+/g,' ');
+}
+function vehiclePriority(v,los){
+  const type = normVehType(v.type);
+  const isWC = type==='wheelchair van' || v.name.toUpperCase().startsWith('WC');
+  const isGW = type==='gurney van' || v.name.toUpperCase().startsWith('GW');
+  const isAmb = type==='ambulance' || v.name.toUpperCase().startsWith('M');
+  if(los==='WHEELCHAIR'){
+    if(isWC) return 1;
+    if(isGW) return 2;
+    return 3;
+  }
+  if(los==='GURNEY' || los==='BARIATRIC GURNEY'){
+    if(isAmb) return 1;
+    if(isGW) return 2;
+    return 3;
+  }
+  if(los==='BARIATRIC WC'){
+    if(isGW) return 1;
+    //if(isAmb) return 2;
+    return 3;
+  }
+  if(los==='BLS' || los==='CCT'){
+    if(isAmb) return 1;
+    return 2;
+  }
+  return 4;
+}
+function assignVehicleForCrew(los,zone,bariatricReq,blockStart,blockEnd,owner){
+  const rule=LOS_RULES[los];if(!rule)return {vehicle:null};
+  const ss=blockStart??0;
+  const se=blockEnd??(ss+SHIFT_TOTAL);
+  const allowedTypes = rule.vehicles.map(normVehType);
+  const candidates = vehicles
+    .filter(v=>
+      v.location===zone&&
+      (v.status==='In-Service'||v.status==='In Service'||v.status==='Active')&&
+      allowedTypes.includes(normVehType(v.type))&&
+      (!bariatricReq||v.bariatric)&&
+      isVehFreeForShift(v.name,ss,se,owner)
+    )
+    .sort((a,b)=>vehiclePriority(a,los)-vehiclePriority(b,los) || a.name.localeCompare(b.name));
+  const v=candidates[0];
+  if(!v) return {vehicle:null};
+  claimVehForShift(v.name,ss,se,owner);
+  return {vehicle:v};
+}
+
+function runMappingsSilent(){
+  mappings={};
+  if(!tripsData.length)return;
+  allDates.forEach(date=>{mappings[date]=runDate(date);});
+  updateDateUI();renderCurrentView();updateNavBadges();
+  toast('Mapping updated with real drive times ✓');
+}
+
+async function runAllMappings(){
+  mappings={};
+  if(!tripsData.length){renderCurrentView();return;}
+  const travelConfigured = settings.apiKey && settings.sacAddress && settings.scAddress;
+  if(travelConfigured){
+    toast('Fetching travel times before mapping...');
+    await preFetchDistances(tripsData);
+  }
+  allDates.forEach(date=>{mappings[date]=runDate(date);});
+  updateDateUI();renderCurrentView();updateNavBadges();
+  toast('Mapping complete');
+}
+
+function runDate(date){
+  const dowIdx=dowIndex(date);
+  const dayTrips=tripsData.filter(t=>t.date===date);
+  resetVehSession();
+
+  // Schedule file takes priority over Homebase
+  const schedEntries=scheduleData[date]||[];
+  const hbEntries=!schedEntries.length&&settings.hbEnabled&&hbSchedule[date];
+  const activeRoster=schedEntries.length
+    ?applyScheduleForDate(date)||roster
+    :(hbEntries?.length?applyHbSchedule(date)||roster:roster);
+  const windows=schedEntries.length
+    ?(scheduleData[date+'_windows']||{})
+    :(hbSchedule[date+'_windows']||{});
+  const todayDow=dowIdx;
+
+  const empState={};
+  activeRoster.forEach(emp=>{
+    const usingSchedule=schedEntries.length>0;
+    const usingHb=!!hbEntries;
+    const active=emp.status==='Active'&&
+      (!usingSchedule&&!usingHb?!!emp.days?.[todayDow]:emp.hbShiftStart!==undefined||!!emp.schedPinned);
+    const win=windows[emp.name+'|'+emp.zone];
+    // Schedule employees: shift window FLOATS — setShift computes it 1hr before first trip.
+    //   schedShiftStart/End kept for vehicle handoff pre-claim and export only.
+    // HB employees: keep the Homebase window (hbPinned=true prevents setShift from overwriting).
+    // Roster-only employees: also float (shiftStart=null, setShift fires on first trip).
+    const isSchedEmp=usingSchedule&&!!emp.schedPinned;
+    const isHbEmp=!isSchedEmp&&!!win;  // has a window from Homebase (not schedule)
+    empState[emp.id||emp.name]={...emp,
+      id:emp.id||emp.name,
+      active,
+      shiftStart:  isSchedEmp?null:(win?win.start:null),
+      shiftEnd:    isSchedEmp?null:(win?win.end:null),
+      lunchStart:  isSchedEmp?null:(win?win.lunch:null),
+      availFrom:   isSchedEmp?0:(win?win.start:0),
+      schedShiftStart:win?win.start:null,  // reference only — not used as hard constraint for schedule emps
+      schedShiftEnd:  win?win.end:null,
+      assignments:[],pairId:null,
+      vehicle:win?.vehicle||null,
+      hbPinned:isHbEmp,   // prevents setShift from overwriting HB windows
+      schedPinned:!!emp.schedPinned,
+    };
+  });
+
+  // PRE-CLAIM vehicle handoff windows from schedule.
+  // Each vehicle slot is claimed for its crew's full shift window.
+  // A second crew sharing the same vehicle can only take trips AFTER
+  // the first crew's shiftEnd — isVehFreeForShift enforces this automatically
+  // because it blocks any owner != the claimant within overlapping windows.
+  if(schedEntries.length){
+    const vehGroups={};
+    schedEntries.forEach(entry=>{
+      if(!entry.vehicle)return;
+      if(!vehGroups[entry.vehicle])vehGroups[entry.vehicle]=[];
+      vehGroups[entry.vehicle].push(entry);
+    });
+    Object.values(vehGroups).forEach(entries=>{
+      entries.sort((a,b)=>a.shiftStart-b.shiftStart);
+      entries.forEach(entry=>{
+        // Use first matched crew member as canonical claim owner for this time window
+        const ownerEmp=Object.values(empState).find(e=>
+          entry.names.some(n=>normName(e.name)===normName(n))
+        );
+        if(!ownerEmp)return;
+        const ownerKey=ownerEmp.id;
+        // Stamp ALL members of this entry with the same schedVehOwner so each
+        // person uses the same claim key in getCrewVehicle — avoids false blocks
+        // between crew members sharing the same rig on the same shift.
+        entry.names.forEach(n=>{
+          const emp=Object.values(empState).find(e=>normName(e.name)===normName(n));
+          if(emp)emp.schedVehOwner=ownerKey;
+        });
+        claimVehForShift(entry.vehicle,entry.shiftStart,entry.shiftEnd,ownerKey);
+      });
+    });
+
+    // Mark scheduled teammate groups so later crew selection can keep them together.
+    schedEntries.forEach((entry,idx)=>{
+      const members=entry.names
+        .map(n=>Object.values(empState).find(e=>e.active&&normName(e.name)===normName(n)))
+        .filter(Boolean);
+      if(members.length<2)return;
+      const crewKey='sched_'+idx+'_'+entry.zone+'_'+entry.shiftStart+'_'+entry.shiftEnd;
+      members.forEach(e=>{e.schedCrewKey=crewKey;});
+    });
+  }
+
+  const emtPairs={};
+  const byZone={};
+  Object.values(empState).forEach(e=>{if(!e.active||e.type!=='EMT')return;byZone[e.zone]=byZone[e.zone]||[];byZone[e.zone].push(e);});
+
+  // Build schedule-defined pairs first (same row = shared vehicle = natural crew pair)
+  const schedPaired=new Set();
+  if(schedEntries.length){
+    schedEntries.forEach(entry=>{
+      if(entry.names.length<2)return;
+      const emtsInEntry=entry.names
+        .map(n=>Object.values(empState).find(e=>e.active&&e.type==='EMT'&&normName(e.name)===normName(n)))
+        .filter(Boolean);
+      if(emtsInEntry.length>=2){
+        const a=emtsInEntry[0],b=emtsInEntry[1];
+        const pk='pair_'+a.id+'_'+b.id;
+        a.pairId=b.pairId=pk;
+        emtPairs[pk]={key:pk,ids:[a.id,b.id],zone:entry.zone,availFrom:0,vehicle:entry.vehicle||null};
+        schedPaired.add(a.id);schedPaired.add(b.id);
+      }
+    });
+  }
+  // Auto-pair any remaining unpaired EMTs by zone
+  Object.entries(byZone).forEach(([zone,emts])=>{
+    const unpaired=emts.filter(e=>!schedPaired.has(e.id));
+    for(let i=0;i+1<unpaired.length;i+=2){
+      const a=unpaired[i],b=unpaired[i+1];const pk='pair_'+a.id+'_'+b.id;
+      a.pairId=b.pairId=pk;emtPairs[pk]={key:pk,ids:[a.id,b.id],zone,availFrom:0,vehicle:null};
+    }
+    if(unpaired.length%2!==0)unpaired[unpaired.length-1].pairId='UNPAIRED';
+  });
+
+  const rnByZone={};
+  Object.values(empState).forEach(e=>{if(e.active&&e.type==='RN'){rnByZone[e.zone]=rnByZone[e.zone]||[];rnByZone[e.zone].push(e);}});
+
+  const cctActive={SACRAMENTO:0,'SANTA CLARA':0};
+  const results={};
+  dayTrips.forEach(t=>{results[t.auth]={...t,crew:[],crewName:null,vehicle:null,status:'Unassigned',flags:[],candidateCrew:[],shiftStart:null,lunchStart:null};});
+
+  const groupAssignments={};
+  const patientGroups={};
+  dayTrips.forEach(t=>{
+    if(t.patientId){
+      patientGroups[t.patientId]=patientGroups[t.patientId]||[];
+      patientGroups[t.patientId].push(t);
+    }
+  });
+  // Only pair trips as W&R groups when the patient has at least one outbound W&R leg
+  // AND at least one return leg (later pickup, same patient name+DOB).
+  // Non-W&R repeat patients are NOT grouped — each trip is assigned independently.
+  const groupKeys = new Set(
+    Object.entries(patientGroups)
+      .filter(([,list])=>{
+        const wrTrip = list.find(t=>t.isWR);
+        if(!wrTrip) return false;  // no W&R leg → not a W&R group
+        return list.some(t=>!t.isWR || t.pickupMins > wrTrip.pickupMins); // has a return leg
+      })
+      .map(([key])=>key)
+  );
+  // Master = the W&R outbound trip (isWR=true, earliest pickup for that patient).
+  const groupMasterAuths = new Set(
+    [...groupKeys].map(pid=>{
+      const wrLegs = patientGroups[pid].filter(t=>t.isWR).sort((a,b)=>a.pickupMins-b.pickupMins);
+      return wrLegs[0].auth;  // earliest W&R trip is the outbound
+    })
+  );
+  dayTrips.forEach(t=>{t.isWrMaster = t.isWR && groupMasterAuths.has(t.auth);});
+  // reservationEnd per patient = pickup time of the last return leg
+  const groupEndTimes = {};
+  groupKeys.forEach(pid=>{
+    const master = patientGroups[pid].find(t=>groupMasterAuths.has(t.auth));
+    const returnLegs = patientGroups[pid].filter(t=>t.pickupMins > master.pickupMins);
+    if(returnLegs.length) groupEndTimes[pid] = Math.max(...returnLegs.map(t=>t.pickupMins));
+  });
+
+  function getGroupAssignment(trip){
+    if(!trip.patientId||!groupKeys.has(trip.patientId))return null;
+    return groupAssignments[trip.patientId]||null;
+  }
+  function saveGroupAssignment(trip, crewIds, vehicle){
+    if(!trip.patientId||!groupKeys.has(trip.patientId))return;
+    groupAssignments[trip.patientId]={crewIds,vehicle};
+  }
+  function canUseGroupCrew(trip, crewIds){
+    const crew = crewIds.map(id=>empState[id]).filter(Boolean);
+    if(crew.length!==crewIds.length){
+      results[trip.auth].flags.push('WAIT/RETURN GROUP CREW MISSING MEMBER');
+      return null;
+    }
+    const blk=fallbackBlock(trip);
+    const invalidMembers = crew.filter(e=>{
+      if(e.zone!==trip.zone||!e.active) return true;
+      return !canDoTrip(e,trip,blk,{ignoreGroupReservedUntil:true,ignoreLunch:true,ignoreAvailFrom:true});
+    });
+    if(invalidMembers.length){
+      const reasons = invalidMembers.map(e=>{
+        if(e.zone!==trip.zone) return lastName(e.name)+' wrong zone';
+        if(!e.active) return lastName(e.name)+' inactive';
+        return lastName(e.name)+' unavailable for W&R';
+      });
+      results[trip.auth].flags.push('WAIT/RETURN GROUP CREW UNAVAILABLE ('+reasons.join(', ')+')');
+      return null;
+    }
+    return crew;
+  }
+  function getWrReservationEnd(trip, blk){
+    if(!trip.isWR || !trip.patientId || !groupKeys.has(trip.patientId)) return trip.pickupMins + blk;
+    if(groupMasterAuths.has(trip.auth) && groupEndTimes[trip.patientId] !== undefined){
+      return groupEndTimes[trip.patientId];
+    }
+    return trip.pickupMins + blk;
+  }
+  function getWrBlock(trip){
+    // Non-W&R: use fallback (completion + transit buffer)
+    if(!trip.isWR) return fallbackBlock(trip);
+    // Standalone W&R — single trip for this patient, or no patient ID:
+    // Block full WR_BLOCK (3hrs) so the crew waits and returns.
+    if(!trip.patientId || !groupKeys.has(trip.patientId)) return WR_BLOCK;
+    // Grouped W&R (2+ trips same patient): block spans from this pickup to end of last group trip.
+    const blk = fallbackBlock(trip);
+    const reservationEnd = getWrReservationEnd(trip, blk);
+    return Math.max(blk, reservationEnd - trip.pickupMins);
+  }
+  function applyGroupCrew(trip, crew, vname, blk){
+    const reservationEnd = getWrReservationEnd(trip, blk);
+    crew.forEach(e=>{
+      if(e.shiftStart===null) setShift(e,trip.pickupMins,trip.travelMins);
+      e.assignments.push({auth:trip.auth,los:trip.los,pickup:trip.pickupMins,blockEnd:reservationEnd,isWR:trip.isWR,vehicle:vname,dropoffAddr:trip.dropoffAddr,pickupAddr:trip.pickupAddr,blkMins:blk});
+      e.availFrom = Math.max(e.availFrom, reservationEnd);
+      if(groupEndTimes[trip.patientId]) e.groupReservedUntil = groupEndTimes[trip.patientId];
+    });
+    if(vname && trip.isWR && groupEndTimes[trip.patientId]){
+      claimVehForShift(vname, trip.pickupMins, reservationEnd, crew[0].id);
+    }
+    results[trip.auth].crew=crew.map(e=>({id:e.id,name:e.name,type:e.type}));
+    results[trip.auth].crewName=crew.map(e=>lastName(e.name)).join(' / ');
+    results[trip.auth].vehicle=vname;
+    results[trip.auth].status='Assigned';
+    if(!vname)results[trip.auth].flags.push('NO VEHICLE');
+  }
+
+  function reuseGroupCrew(trip, count, rule){
+    // Only attempt crew reuse for known W&R pairs
+    if(!trip.patientId || !groupKeys.has(trip.patientId)) return false;
+    // Outbound leg has no prior assignment yet — skip silently, let normal assignment run
+    if(groupMasterAuths.has(trip.auth)) return false;
+    const group = getGroupAssignment(trip);
+    if(!group){
+      // Return leg with no saved crew — flag it so dispatcher knows
+      results[trip.auth].flags.push('WAIT/RETURN: NO CREW SAVED FOR RETURN LEG');
+      return false;
+    }
+    const crew = canUseGroupCrew(trip, group.crewIds);
+    if(!crew || crew.length<count){
+      if(group.crewIds.length < count) results[trip.auth].flags.push('WAIT/RETURN SAVED CREW INCOMPLETE');
+      return false;
+    }
+    const vname = group.vehicle;
+    if(!vname){
+      results[trip.auth].flags.push('WAIT/RETURN SAVED CREW HAS NO VEHICLE');
+      return false;
+    }
+    const chosen = crew.slice(0,count);
+    applyGroupCrew(trip, chosen, vname, fallbackBlock(trip));
+    return true;
+  }
+
+  function getBaseToPickupMins(trip){
+    if(!trip||!trip.zone||!trip.pickupAddr)return null;
+    const key=trip.zone+'|'+trip.pickupAddr;
+    return travelCache[key]!==undefined?travelCache[key]:null;
+  }
+  function calcEmpShiftStart(e,pm,tv){
+    const raw=calcShiftStart(pm,tv);
+    // If a scheduled start exists, the crew can be pulled in at most 1hr early
+    // (i.e. never earlier than schedShiftStart - PREP_MAX).
+    // Example: scheduled 1500 → floor is 1400; a 1330 first trip still yields 1400.
+    if(e.schedShiftStart!=null) return Math.max(raw, e.schedShiftStart - PREP_MAX);
+    return raw;
+  }
+  function setShift(e,pm,tv){
+    if(e.shiftStart!==null)return;
+    if(e.hbPinned)return;
+    const ss=calcEmpShiftStart(e,pm,tv);
+    e.shiftStart=ss;e.shiftEnd=ss+SHIFT_TOTAL;e.lunchStart=calcLunchStart(ss);
+  }
+  function elig(e,pm){
+    if(!e.active)return false;
+    if(e.shiftStart===null)return pm>=e.availFrom;
+    return pm>=e.shiftStart&&pm<e.shiftEnd&&pm>=e.availFrom;
+  }
+  function canDoTrip(e,trip,blk,{ignoreGroupReservedUntil=false,ignoreLunch=false,ignoreAvailFrom=false}={}){
+    if(!e.active) return false;
+    const pm=trip.pickupMins;
+    if(!ignoreGroupReservedUntil && e.groupReservedUntil && pm < e.groupReservedUntil) return false;
+    if(!ignoreAvailFrom && pm < e.availFrom) return false;
+    const shiftStart = e.shiftStart!==null ? e.shiftStart : calcEmpShiftStart(e,pm,trip.travelMins);
+    // Use the actual schedule/HB shift end when set; fall back to SHIFT_TOTAL for auto-started employees
+    const shiftEnd=(e.shiftEnd!==null&&e.shiftEnd!==undefined&&!isNaN(e.shiftEnd)&&e.shiftEnd>shiftStart)
+      ?e.shiftEnd
+      :shiftStart+SHIFT_TOTAL;
+    const lunchStart = e.shiftStart!==null ? e.lunchStart : calcLunchStart(shiftStart);
+    const lunchEnd = lunchStart + 30;
+    if(pm < shiftStart || pm >= shiftEnd) return false;
+    if(pm + blk > shiftEnd) return false;
+    if(!ignoreLunch && pm < lunchEnd && pm + blk > lunchStart) return false;
+    return true;
+  }
+  function getCrewVehicle(e,trip,blk,rule){
+    const pm=trip.pickupMins;
+    const ss=pm;
+    const se=pm+blk;
+    if(e.vehicle){
+      // Use the shared crew claim key so all members of the same scheduled
+      // entry pass the free-check against each other (same key = same owner).
+      const ownerId=e.schedVehOwner||e.id;
+      if(isVehFreeForShift(e.vehicle,ss,se,ownerId)){
+        claimVehForShift(e.vehicle,ss,se,ownerId);
+        return e.vehicle;
+      }
+      return null;
+    }
+    // Schedule-pinned employees MUST use their scheduled vehicle.
+    // Don't fall through to the pool — that would assign the wrong rig.
+    if(e.schedPinned)return null;
+    const vInfo=assignVehicleForCrew(trip.los,trip.zone,rule?.bariatric||false,ss,se,e.id);
+    e.vehicle=vInfo.vehicle?vInfo.vehicle.name:null;
+    return e.vehicle;
+  }
+  function effCrew(trip,rule){return trip.specialEquip?Math.max(2,rule.crew):rule.crew;}
+
+  function doNE(trip,count,rule){
+    const pm=trip.pickupMins;
+    const blk=getWrBlock(trip);
+    if(reuseGroupCrew(trip,count,rule)) return true;
+    const allElig=Object.values(empState).filter(e=>e.active&&e.type==='Non-EMT'&&e.zone===trip.zone&&canDoTrip(e,trip,blk));
+    const committed=allElig.filter(e=>e.shiftStart!==null).sort((a,b)=>(a.availFrom||0)-(b.availFrom||0));
+    const fresh=allElig.filter(e=>e.shiftStart===null);
+    const pool=[...committed,...fresh];
+    if(pool.length<count)return false;
+    // count===1: iterate pool in priority order until a candidate with an available
+    // vehicle is found — avoids false "no vehicle" when first choice is in handoff.
+    // count>1: keep original committed-lead logic (rare 2-NE scenario).
+    const chosen=[];
+    let vname=null;
+    if(count===1){
+      for(const cand of pool){
+        const v=getCrewVehicle(cand,trip,blk,rule);
+        if(v){chosen.push(cand);vname=v;break;}
+      }
+      if(!chosen.length){
+        results[trip.auth].candidateCrew=pool.slice(0,3).map(e=>({id:e.id,name:e.name,type:'Non-EMT'}));
+        const vehLabel=rule.vehicles.join(' or ')+(rule.bariatric?' (bariatric)':'');
+        results[trip.auth].flags.push('CREW AVAILABLE BUT NO VEHICLE ('+vehLabel+')');
+        return false;
+      }
+    } else {
+      let c=pool.slice(0,count);
+      // For 2-person Non-EMT needs, prefer a pre-scheduled teammate pair first.
+      if(count===2){
+        const bySchedCrew={};
+        pool.forEach(e=>{
+          if(!e.schedCrewKey)return;
+          if(!bySchedCrew[e.schedCrewKey])bySchedCrew[e.schedCrewKey]=[];
+          bySchedCrew[e.schedCrewKey].push(e);
+        });
+        const schedPair=Object.values(bySchedCrew).find(g=>g.length>=2);
+        if(schedPair)c=schedPair.slice(0,2);
+      }
+      c.forEach(e=>{if(e.shiftStart===null){const travel=e.assignments.length===0?getBaseToPickupMins(trip):null;setShift(e,pm,travel);}});
+      const lead=c[0];
+      lead.vehicle=getCrewVehicle(lead,trip,blk,rule);
+      c.forEach(e=>e.vehicle=lead.vehicle);
+      if(!lead.vehicle){
+        results[trip.auth].candidateCrew=c.map(e=>({id:e.id,name:e.name,type:'Non-EMT'}));
+        const vehLabel=rule.vehicles.join(' or ')+(rule.bariatric?' (bariatric)':'');
+        results[trip.auth].flags.push('CREW AVAILABLE BUT NO VEHICLE ('+vehLabel+')');
+        return false;
+      }
+      vname=lead.vehicle;
+      chosen.push(...c);
+    }
+    chosen.forEach(e=>{
+      if(e.shiftStart===null)setShift(e,pm,trip.travelMins);
+      e.assignments.push({auth:trip.auth,los:trip.los,pickup:pm,blockEnd:pm+blk,isWR:trip.isWR,vehicle:vname,dropoffAddr:trip.dropoffAddr,pickupAddr:trip.pickupAddr,blkMins:blk});
+      e.availFrom=pm+blk;
+      // W&R outbound: lock crew via groupReservedUntil so return leg can find them
+      // (canUseGroupCrew uses ignoreGroupReservedUntil:true to bypass this)
+      if(trip.isWR && trip.patientId && groupKeys.has(trip.patientId)) e.groupReservedUntil=pm+blk;
+    });
+    results[trip.auth].crew=chosen.map(e=>({id:e.id,name:e.name,type:'Non-EMT'}));
+    results[trip.auth].crewName=chosen.length===1?lastName(chosen[0].name):chosen.map(e=>lastName(e.name)).join(' / ');
+    results[trip.auth].vehicle=vname;
+    results[trip.auth].status='Assigned';
+    if(!vname)results[trip.auth].flags.push('NO VEHICLE');
+    if(trip.patientId) saveGroupAssignment(trip, chosen.map(e=>e.id), vname);
+    return true;
+  }
+  function doEMT(trip,rule){
+    const pm=trip.pickupMins;
+    const blk=getWrBlock(trip);
+    if(reuseGroupCrew(trip,2,rule)) return true;
+    const eligPairs=Object.values(emtPairs).filter(p=>{
+      if(p.zone!==trip.zone)return false;
+      const a=empState[p.ids[0]],b=empState[p.ids[1]];
+      return a&&b&&canDoTrip(a,trip,blk)&&canDoTrip(b,trip,blk)&&pm>=p.availFrom;
+    });
+    const pair=eligPairs.find(p=>empState[p.ids[0]].shiftStart!==null)||eligPairs[0]||null;
+    if(!pair)return false;
+    const[aId,bId]=pair.ids,a=empState[aId],b=empState[bId];
+    const travel = a.assignments.length===0?getBaseToPickupMins(trip):null;
+    setShift(a,pm,travel);setShift(b,pm,travel);
+    pair.availFrom=pm+blk;
+    if(!pair.vehicle || !isVehFreeForShift(pair.vehicle,pm,pm+blk,a.schedVehOwner||a.id)){
+      pair.vehicle=getCrewVehicle(a,trip,blk,rule);
+      a.vehicle=b.vehicle=pair.vehicle;
+    }
+    if(!pair.vehicle){
+      results[trip.auth].candidateCrew=[a,b].map(e=>({id:e.id,name:e.name,type:'EMT'}));
+      const vehLabel = rule.vehicles.join(' or ');
+      results[trip.auth].flags.push('CREW AVAILABLE BUT NO VEHICLE ('+vehLabel+')');
+      return false;
+    }
+    const vname=pair.vehicle;
+    [a,b].forEach(e=>{
+      e.assignments.push({auth:trip.auth,los:trip.los,pickup:pm,blockEnd:pm+blk,isWR:trip.isWR,vehicle:vname,dropoffAddr:trip.dropoffAddr,pickupAddr:trip.pickupAddr,blkMins:blk});
+      e.availFrom=pm+blk;
+      if(trip.isWR && trip.patientId && groupKeys.has(trip.patientId)) e.groupReservedUntil=pm+blk;
+    });
+    results[trip.auth].crew=[a,b].map(e=>({id:e.id,name:e.name,type:'EMT'}));
+    results[trip.auth].crewName=lastName(a.name)+' / '+lastName(b.name);
+    results[trip.auth].vehicle=vname;
+    results[trip.auth].status='Assigned';
+    if(!vname)results[trip.auth].flags.push('NO VEHICLE');
+    if(trip.patientId) saveGroupAssignment(trip, [a.id,b.id], vname);
+    return true;
+  }
+  function doCCT(trip,rule){
+    const pm=trip.pickupMins;
+    const blk=getWrBlock(trip);
+    if(reuseGroupCrew(trip,3,rule)) return true;
+    if((cctActive[trip.zone]||0)>=1)results[trip.auth].flags.push('CCT CAP WARN');
+    const pair=Object.values(emtPairs).find(p=>{
+      if(p.zone!==trip.zone)return false;
+      const a=empState[p.ids[0]],b=empState[p.ids[1]];
+      return a&&b&&canDoTrip(a,trip,blk)&&canDoTrip(b,trip,blk)&&pm>=p.availFrom;
+    });
+    if(!pair)return false;
+    const rns=(rnByZone[trip.zone]||[]).filter(e=>canDoTrip(e,trip,blk)).sort((a,b)=>(a.availFrom||0)-(b.availFrom||0));
+    if(!rns.length)return false;
+    const[aId,bId]=pair.ids,a=empState[aId],b=empState[bId],rn=rns[0];
+    pair.availFrom=pm+blk;cctActive[trip.zone]=(cctActive[trip.zone]||0)+1;
+    const travel = a.assignments.length===0?getBaseToPickupMins(trip):null;
+    [a,b,rn].forEach(e=>{setShift(e,pm,travel);});
+    if(!pair.vehicle || !isVehFreeForShift(pair.vehicle,pm,pm+blk,a.schedVehOwner||a.id)){
+      pair.vehicle=getCrewVehicle(a,trip,blk,{bariatric:false});
+      a.vehicle=b.vehicle=rn.vehicle=pair.vehicle;
+    }
+    if(!pair.vehicle){
+      results[trip.auth].candidateCrew=[a,b,rn].map(e=>({id:e.id,name:e.name,type:e.type}));
+      const vehLabel = rule.vehicles.join(' or ');
+      results[trip.auth].flags.push('CREW AVAILABLE BUT NO VEHICLE ('+vehLabel+')');
+      return false;
+    }
+    const vname=pair.vehicle;
+    [a,b,rn].forEach(e=>{
+      e.assignments.push({auth:trip.auth,los:trip.los,pickup:pm,blockEnd:pm+blk,isWR:trip.isWR,vehicle:vname,dropoffAddr:trip.dropoffAddr,pickupAddr:trip.pickupAddr,blkMins:blk});
+      e.availFrom=pm+blk;
+      if(trip.isWR && trip.patientId && groupKeys.has(trip.patientId)) e.groupReservedUntil=pm+blk;
+    });
+    results[trip.auth].crew=[a,b,rn].map(e=>({id:e.id,name:e.name,type:e.type}));
+    results[trip.auth].crewName=lastName(a.name)+' / '+lastName(b.name)+' / '+lastName(rn.name);
+    results[trip.auth].vehicle=vname;
+    results[trip.auth].status='Assigned';
+    if(!vname)results[trip.auth].flags.push('NO VEHICLE');
+    if(trip.patientId) saveGroupAssignment(trip, [a.id,b.id,rn.id], vname);
+    return true;
+  }
+
+  dayTrips.slice().sort((a,b)=>a.pickupMins-b.pickupMins).forEach(trip=>{
+      const rule=LOS_RULES[trip.los];if(!rule)return;
+      if(results[trip.auth].status==='Assigned')return;
+      if(trip.patientId && groupKeys.has(trip.patientId) && !groupMasterAuths.has(trip.auth) && !groupAssignments[trip.patientId]) return;
+      
+      // Dynamic location check instead of hardcoded SAC only limit
+      if(!checkLocationAndCapability(trip.zone, trip.los)){
+        results[trip.auth].status='Blocked';
+        results[trip.auth].flags.push(trip.los+' not authorised for '+trip.zone+' base');
+        return;
+      }
+
+      if(trip.los==='CCT'){
+        const blkCCT=fallbackBlock(trip);
+        const hasPair=Object.values(emtPairs).some(p=>{
+          if(p.zone!==trip.zone)return false;
+          const a=empState[p.ids[0]],b=empState[p.ids[1]];
+          return a&&b&&canDoTrip(a,trip,blkCCT)&&canDoTrip(b,trip,blkCCT)&&trip.pickupMins>=p.availFrom;
+        });
+        const hasRN=(rnByZone[trip.zone]||[]).some(e=>canDoTrip(e,trip,blkCCT));
+        if(!doCCT(trip,rule)){
+          if(!hasPair)results[trip.auth].flags.push('No EMT pair available at '+toHHMM(trip.pickupMins));
+          if(!hasRN)results[trip.auth].flags.push('No RN available at '+toHHMM(trip.pickupMins));
+        }
+        return;
+      }
+      if(useEMTForTrip(trip,rule)){
+        if(!doEMT(trip,rule)){
+          const pm=trip.pickupMins;
+          const pairs=Object.values(emtPairs).filter(p=>p.zone===trip.zone);
+          if(!pairs.length){results[trip.auth].flags.push('No EMT pairs in '+trip.zone);}
+          else{
+            const blocked=pairs.map(p=>{
+              const a=empState[p.ids[0]],b=empState[p.ids[1]];
+              if(!a||!b)return 'Pair unavailable';
+              if(pm<p.availFrom)return (p.crewName||p.key)+' busy until '+toHHMM(p.availFrom);
+              if(!elig(a,pm)||!elig(b,pm))return (p.crewName||p.key)+' outside shift';
+              return null;
+            }).filter(Boolean);
+            blocked.forEach(r=>results[trip.auth].flags.push(r));
+            if(!blocked.length)results[trip.auth].flags.push('All EMT pairs busy at '+toHHMM(pm));
+          }
+        }
+        return;
+      }
+      const needed=effCrew(trip,rule);
+      if(!doNE(trip,needed,rule)){
+        const pm=trip.pickupMins;
+        const blk=getWrBlock(trip);
+        const nePool=Object.values(empState).filter(e=>e.active&&e.type==='Non-EMT'&&e.zone===trip.zone);
+        const avail=nePool.filter(e=>canDoTrip(e,trip,blk));
+        const started=nePool.filter(e=>e.shiftStart!==null);
+        const allShiftsEnded=started.length>0&&started.every(e=>pm>=e.shiftEnd);
+        const latestShiftEnd=started.length?Math.max(...started.map(e=>e.shiftEnd)):null;
+        const attemptedFallback = canFallbackToEMT(trip) && doEMT(trip,rule);
+        if(attemptedFallback){
+          results[trip.auth].flags.push('EMT used to cover transport');
+          return;
+        }
+        if(NO_EMT_FALLBACK.includes(trip.los)){
+          results[trip.auth].flags.push('No EMT fallback for wheelchair transport');
+        }
+        if(!nePool.length){
+          results[trip.auth].flags.push('No Non-EMT staff in '+trip.zone);
+          results[trip.auth].shiftGap=true;
+        } else if(allShiftsEnded){
+          results[trip.auth].flags.push('All shifts ended by '+toHHMM(latestShiftEnd)+' — PM crew needed for '+toHHMM(pm)+' pickup');
+          results[trip.auth].shiftGap=true;
+        } else if(!avail.length){
+          const busyWorkers=started.filter(e=>pm<e.shiftEnd).sort((a,b)=>a.availFrom-b.availFrom);
+          const nextFree=busyWorkers.length?Math.min(...busyWorkers.map(e=>e.availFrom)):null;
+          results[trip.auth].flags.push('All '+nePool.length+' Non-EMT busy'+(nextFree?' — next free '+toHHMM(nextFree):''));
+        } else {
+          results[trip.auth].flags.push('Need '+needed+' Non-EMT, only '+avail.length+' available at '+toHHMM(pm));
+        }
+        const emtPairList=Object.values(emtPairs).filter(p=>p.zone===trip.zone);
+        if(!emtPairList.length)results[trip.auth].flags.push('No EMT pairs for fallback either');
+        else{
+          const emtAllEnded=emtPairList.every(p=>{const a=empState[p.ids[0]],b=empState[p.ids[1]];return a&&b&&a.shiftEnd&&pm>=a.shiftEnd;});
+          if(emtAllEnded)results[trip.auth].flags.push('All EMT shifts also ended');
+          else results[trip.auth].flags.push('All EMT pairs busy at '+toHHMM(pm));
+        }
+      }
+    });
+
+  Object.entries(patientGroups).forEach(([pid,group])=>{
+    if(group.length<=1) return;
+    group.sort((a,b)=>a.pickupMins-b.pickupMins).forEach(trip=>{
+      if(results[trip.auth].status!=='Unassigned') return;
+      if(!getGroupAssignment(trip)) return;
+      const rule = LOS_RULES[trip.los];
+      if(!rule) return;
+      if(trip.los==='CCT') doCCT(trip,rule);
+      else if(rule.emt>0) doEMT(trip,rule);
+      else doNE(trip,effCrew(trip,rule),rule);
+    });
+  });
+
+  Object.values(emtPairs).forEach(p=>{
+    const[aId,bId]=p.ids,a=empState[aId],b=empState[bId];if(!a||!b)return;
+    const def=lastName(a.name)+' / '+lastName(b.name);
+    p.crewName=crewNameOverrides[p.key]||def;p.defaultName=def;
+    a.crewName=b.crewName=p.crewName;
+  });
+  Object.values(empState).forEach(e=>{
+    if(e.active&&e.type!=='EMT')e.crewName=crewNameOverrides['ne_'+e.id]||lastName(e.name);
+    if(e.active&&e.type==='RN')e.crewName=crewNameOverrides['rn_'+e.id]||lastName(e.name);
+  });
+  Object.values(results).forEach(r=>{
+    if(!r.crewName&&r.crew?.length>0){const first=empState[r.crew[0].id];r.crewName=first?.crewName||r.crew.map(c=>lastName(c.name)).join(' / ');}
+    const req=LOS_RULES[r.los]?.crew||1;
+    if(r.status==='Assigned'&&(r.crew?.length||0)<req){r.status='Partial';r.flags.push('UNDERSTAFFED');}
+    if(r.status==='Assigned'){r.flags=(r.flags||[]).filter(f=>f!=='WAIT/RETURN NO SAVED CREW FOR PATIENT');}
+    if(r.crew?.length>0){const fe=empState[r.crew[0].id];if(fe){r.shiftStart=fe.shiftStart;r.lunchStart=fe.lunchStart;}}
+  });
+
+  function removeAssignedTrip(r,reason){
+    if(!r||r.status!=='Assigned')return;
+    r.status='Unassigned';
+    r.flags=r.flags||[];
+    if(!r.flags.includes(reason)) r.flags.push(reason);
+    if(r.crew?.length){
+      r.crew.forEach(c=>{
+        const emp=empState[c.id];
+        if(emp){
+          emp.assignments = emp.assignments.filter(a=>a.auth!==r.auth);
+          if(!emp.assignments.length) emp.vehicle = null;
+          else if(emp.assignments.some(a=>a.vehicle!==emp.vehicle)){
+            const remaining = [...new Set(emp.assignments.map(a=>a.vehicle).filter(Boolean))];
+            emp.vehicle = remaining.length===1?remaining[0]:remaining[0]||null;
+          }
+        }
+      });
+    }
+    r.crew=[];r.crewName=null;r.vehicle=null;
+  }
+
+  Object.values(empState).forEach(emp=>{
+    const sorted=emp.assignments.slice().sort((a,b)=>a.pickup-b.pickup);
+    let lastEnd=-1;
+    sorted.forEach(asgn=>{
+      if(asgn.pickup<lastEnd){
+        const r=results[asgn.auth];
+        removeAssignedTrip(r,'CREW CONFLICT: overlapping trip');
+      } else {
+        lastEnd=asgn.blockEnd;
+      }
+    });
+  });
+
+  const vehicleBookings={};
+  Object.values(results).filter(r=>r.status==='Assigned'&&r.vehicle).forEach(r=>{
+    const start=r.pickupMins;
+    const end=start+fallbackBlock(r);
+    vehicleBookings[r.vehicle]=vehicleBookings[r.vehicle]||[];
+    vehicleBookings[r.vehicle].push({auth:r.auth,start,end});
+  });
+  Object.entries(vehicleBookings).forEach(([vehicle,list])=>{
+    list.sort((a,b)=>a.start-b.start);
+    let prev=list[0];
+    for(let i=1;i<list.length;i++){
+      const cur=list[i];
+      if(cur.start<prev.end){
+        const r=results[cur.auth];
+        removeAssignedTrip(r,'VEHICLE CONFLICT: '+vehicle+' overlaps '+prev.auth+' '+toHHMM(prev.start)+'-'+toHHMM(prev.end));
+      } else {
+        prev=cur;
+      }
+    }
+  });
+
+  return{results:Object.values(results),empState,emtPairs,rnByZone};
+}
+
+// HELPERS
+function toMins(t){if(!t)return 0;const[h,m]=String(t).split(':').map(Number);return h*60+m;}
+function toHHMM(m){if(m===null||m===undefined)return '--';const h=Math.floor(Math.abs(m)/60)%24,mn=Math.abs(m)%60;return String(h).padStart(2,'0')+':'+String(mn).padStart(2,'0');}
+function dowIndex(d){return(new Date(d+'T00:00:00').getDay()+6)%7;}
+function lastName(n){if(!n)return '?';const p=n.trim().split(/\s+/);return p[p.length-1];}
+function getRemainingShiftMinutes(emp){
+  if(emp.shiftStart===null||emp.shiftEnd===null)return null;
+  const lastEnd = emp.assignments.length ? Math.max(...emp.assignments.map(a=>a.blockEnd)) : emp.shiftStart;
+  return Math.max(0, emp.shiftEnd - lastEnd);
+}
+function getCrewCountsForDate(date){
+  const m = mappings[date];
+  if(!m) return {total:0,EMT:0,RN:0,'Non-EMT':0};
+  const active = Object.values(m.empState).filter(e=>e.active);
+  const counts = {total:active.length,EMT:0,RN:0,'Non-EMT':0};
+  active.forEach(e=>{counts[e.type]=(counts[e.type]||0)+1;});
+  return counts;
+}
+function getZoneSummaryForDate(date){
+  const m = mappings[date];
+  const summary = {tripZones:{},crewZones:{}};
+  if(!m) return summary;
+  (m.results||[]).forEach(r=>{summary.tripZones[r.zone]=(summary.tripZones[r.zone]||0)+1;});
+  Object.values(m.empState).filter(e=>e.active).forEach(e=>{summary.crewZones[e.zone]=(summary.crewZones[e.zone]||0)+1;});
+  return summary;
+}
+function estimateAdditionalCrews(unassignedTrips){
+  const crewsByKey = {};
+  const trips = [...unassignedTrips].filter(trip=>trip&&typeof trip.pickupMins==='number').sort((a,b)=>a.pickupMins-b.pickupMins);
+  trips.forEach(trip=>{
+    const rule = LOS_RULES[trip.los] || {emt:0};
+    const crewType = trip.los==='CCT' ? 'CCT' : rule.emt>0 ? 'EMT' : 'Non-EMT';
+    const key = (trip.zone||'')+'|'+crewType;
+    const blk = fallbackBlock(trip);
+    const travel = getBaseToPickupMins(trip);
+    const ss = calcShiftStart(trip.pickupMins, travel);
+    const se = ss + SHIFT_TOTAL;
+    if(trip.pickupMins < ss || trip.pickupMins + blk > se) return;
+    const crews = crewsByKey[key] || [];
+    let assigned = false;
+    for(const crew of crews){
+      if(trip.pickupMins >= crew.availFrom && trip.pickupMins + blk <= crew.shiftEnd){
+        crew.availFrom = trip.pickupMins + blk;
+        assigned = true;
+        break;
+      }
+    }
+    if(!assigned){
+      crews.push({availFrom: trip.pickupMins + blk, shiftEnd: se});
+    }
+    crewsByKey[key] = crews;
+  });
+  return Object.values(crewsByKey).reduce((sum,crews)=>sum+crews.length,0);
+}
+async function getNextTransitMins(date, auth){
+  const m = mappings[date];
+  if(!m) return '';
+  const trip = m.results.find(r=>r.auth===auth);
+  if(!trip || !trip.dropoffAddr) return '';
+  const crewList = trip.crew||[];
+  if(!crewList.length) return '';
+  const firstCrew = crewList[0];
+  const emp = m.empState?.[firstCrew.id];
+  if(!emp) return '';
+  const assignments = emp.assignments.slice().sort((a,b)=>a.pickup-b.pickup);
+  const idx = assignments.findIndex(a=>a.auth===auth);
+  if(idx<0 || idx+1>=assignments.length) return '';
+  const nextAuth = assignments[idx+1].auth;
+  const nextTrip = m.results.find(r=>r.auth===nextAuth);
+  if(!nextTrip || !nextTrip.pickupAddr) return '';
+  const key = 'transit '+trip.dropoffAddr+' '+nextTrip.pickupAddr;
+  const mins = distCache[key];
+  if(mins!==undefined) return mins;
+  if(!settings.apiKey) return '';
+  const transit = await getInterTripTransit(trip.dropoffAddr, nextTrip.pickupAddr);
+  return transit!==null?transit:'';
+}
+async function getActualTransportMins(r){
+  return COMPLETION_MINUTES;
+}
+function sanitizeSheetName(name){
+  // Excel sheet names: max 31 chars, no \ / ? * [ ] :
+  return String(name||'').replace(/[\\\/\?\*\[\]:]/g,'').trim().slice(0,31)||'Vehicle';
+}
+
+async function exportAssignmentsToExcel(){
+  const results=getResults();
+  if(!results.length){toast('No assignments to export','warn');return;}
+
+  const wb=XLSX.utils.book_new();
+
+  // ── 1. Per-vehicle sheets (one per vehicle, all dates combined) ───────────
+  const byVehicle={};
+  results.forEach(r=>{
+    if(r.status!=='Assigned'&&!manualOverrides[r._date+':'+r.auth])return;
+    const veh=r.vehicle||'NO VEHICLE';
+    if(!byVehicle[veh])byVehicle[veh]=[];
+    byVehicle[veh].push(r);
+  });
+
+  const vehNames=Object.keys(byVehicle).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
+
+  vehNames.forEach(veh=>{
+    const trips=byVehicle[veh].slice().sort((a,b)=>{
+      if(a._date<b._date)return -1;
+      if(a._date>b._date)return 1;
+      return a.pickupMins-b.pickupMins;
+    });
+    const sheetRows=trips.map((r,idx)=>({
+      '#':idx+1,
+      'Date':r._date,
+      'Auth #':r.auth,
+      'LOS':r.los,
+      'Zone':r.zone,
+      'Patient':r.patient||'',
+      'Pickup Time':r.pickup||'',
+      'Pickup Address':r.pickupAddr||'',
+      'Dropoff Address':r.dropoffAddr||'',
+      'Crew':r.crew?r.crew.map(c=>c.name).join(' / '):'',
+      'W&R':r.isWR?'Yes':'No',
+      'Special Equipment':r.specialEquip||'',
+      'Flags':r.flags?.filter(Boolean).join('; ')||'',
+    }));
+    const ws=XLSX.utils.json_to_sheet(sheetRows,{
+      header:['#','Date','Auth #','LOS','Zone','Patient','Pickup Time','Pickup Address','Dropoff Address','Crew','W&R','Special Equipment','Flags']
+    });
+    ws['!cols']=[{wch:4},{wch:12},{wch:12},{wch:7},{wch:12},{wch:22},{wch:10},{wch:38},{wch:38},{wch:32},{wch:5},{wch:16},{wch:32}];
+    XLSX.utils.book_append_sheet(wb,ws,sanitizeSheetName(veh));
+  });
+
+  // ── 2. Unassigned trips sheet ─────────────────────────────────────────────
+  const unassigned=results.filter(r=>r.status==='Unassigned'&&!manualOverrides[r._date+':'+r.auth]);
+  if(unassigned.length){
+    const uRows=unassigned.sort((a,b)=>a._date<b._date?-1:a._date>b._date?1:a.pickupMins-b.pickupMins).map(r=>({
+      'Date':r._date,
+      'Auth #':r.auth,
+      'LOS':r.los,
+      'Zone':r.zone,
+      'Patient':r.patient||'',
+      'Pickup Time':r.pickup||'',
+      'Pickup Address':r.pickupAddr||'',
+      'Dropoff Address':r.dropoffAddr||'',
+      'Flags':r.flags?.join('; ')||'',
+    }));
+    const uws=XLSX.utils.json_to_sheet(uRows,{header:['Date','Auth #','LOS','Zone','Patient','Pickup Time','Pickup Address','Dropoff Address','Flags']});
+    uws['!cols']=[{wch:12},{wch:12},{wch:7},{wch:12},{wch:22},{wch:10},{wch:38},{wch:38},{wch:42}];
+    XLSX.utils.book_append_sheet(wb,uws,'Unassigned');
+  }
+
+  // ── 3. Shift Summary sheet ────────────────────────────────────────────────
+  // One row per active employee per date showing their computed shift window,
+  // vehicle, and trip count so dispatchers can see what actually got scheduled.
+  const shiftRows=[];
+  Object.entries(mappings).sort(([a],[b])=>a<b?-1:1).forEach(([date,m])=>{
+    if(!m?.empState)return;
+    Object.values(m.empState)
+      .filter(e=>e.active)
+      .sort((a,b)=>{
+        if(a.zone<b.zone)return -1;
+        if(a.zone>b.zone)return 1;
+        return (a.shiftStart??0)-(b.shiftStart??0);
+      })
+      .forEach(e=>{
+        const trips=e.assignments||[];
+        const lastEnd=trips.length?trips.reduce((mx,a)=>a.blockEnd>mx?a.blockEnd:mx,0):null;
+        // Actual shift window: e.shiftStart (computed 1hr before first trip) through last block end
+        const actualStart=e.shiftStart!==null?e.shiftStart:(trips.length?Math.min(...trips.map(a=>a.pickup)):null);
+        const actualEnd  =e.shiftEnd!==null?e.shiftEnd:(trips.length?Math.max(...trips.map(a=>a.blockEnd)):null);
+        // For export: show scheduled times if they came from the schedule file, else show mapped times
+        const dispSchedStart=e.schedShiftStart!==null&&e.schedShiftStart!==undefined?toHHMM(e.schedShiftStart):'';
+        const dispSchedEnd  =e.schedShiftEnd!==null&&e.schedShiftEnd!==undefined?toHHMM(e.schedShiftEnd):'';
+        const dispActStart  =actualStart!==null?toHHMM(actualStart):'';
+        const dispActEnd    =actualEnd!==null?toHHMM(actualEnd):(e.shiftEnd!==null?toHHMM(e.shiftEnd):'');
+        shiftRows.push({
+          'Date':date,
+          'Name':e.name,
+          'Type':e.type,
+          'Zone':e.zone,
+          'Vehicle':e.vehicle||'',
+          'Sched Start':dispSchedStart,
+          'Sched End':dispSchedEnd,
+          'Actual Start':dispActStart,
+          'Actual End':dispActEnd,
+          'Lunch':e.lunchStart?toHHMM(e.lunchStart):(actualStart!==null?toHHMM(actualStart+4*60+30):''),
+          '# Trips':trips.length,
+        });
+      });
+  });
+  const sws=XLSX.utils.json_to_sheet(shiftRows,{
+    header:['Date','Name','Type','Zone','Vehicle','Sched Start','Sched End','Actual Start','Actual End','Lunch','# Trips']
+  });
+  sws['!cols']=[{wch:12},{wch:24},{wch:9},{wch:13},{wch:10},{wch:11},{wch:10},{wch:12},{wch:11},{wch:8},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,sws,'Shift Summary');
+
+  const dateLabel=activeDate==='all'?'all_dates':activeDate;
+  XLSX.writeFile(wb,'ift_crew_'+dateLabel+'.xlsx');
+  toast('Exported — '+vehNames.length+' vehicle sheet'+(vehNames.length!==1?'s':'')+(unassigned.length?' · '+unassigned.length+' unassigned':''));
+}
+function excelDateToStr(v){
+  if(!v&&v!==0)return '';
+  if(v instanceof Date){
+    if(isNaN(v.getTime()))return '';
+    const y=v.getFullYear(),m=v.getMonth()+1,d=v.getDate();
+    return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  }
+  if(typeof v==='number'){
+    try{const d=XLSX.SSF.parse_date_code(v);return d.y+'-'+String(d.m).padStart(2,'0')+'-'+String(d.d).padStart(2,'0');}catch(e){}
+  }
+  const s=String(v).trim();
+  const m=s.match(/(\d{4})-(\d{2})-(\d{2})/);if(m)return m[0];
+  const m2=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m2)return m2[3]+'-'+m2[1].padStart(2,'0')+'-'+m2[2].padStart(2,'0');
+  return '';
+}
+function normaliseTime(v){
+  if(!v&&v!==0)return '';
+  if(v instanceof Date&&!isNaN(v.getTime())){
+    // Excel time-only fractions (~1899 epoch) are stored as UTC by XLSX.js with cellDates:true.
+    // Use UTC accessors for those to avoid local-timezone shift; local accessors for real datetimes.
+    const useUTC=v.getFullYear()<1950;
+    const hh=useUTC?v.getUTCHours():v.getHours();
+    const mm=useUTC?v.getUTCMinutes():v.getMinutes();
+    return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+  }
+  if(typeof v==='number')return toHHMM(Math.round(v*1440));
+  const s=String(v).trim();
+  if(/^\d{2}:\d{2}$/.test(s))return s;
+  if(/^\d{1}:\d{2}$/.test(s))return '0'+s;
+  // Handle HH:MM[:SS] [AM|PM]
+  const ampm=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/i);
+  if(ampm){
+    let h=parseInt(ampm[1]),m=ampm[2],pm=ampm[3]&&ampm[3].toUpperCase()==='PM';
+    if(pm&&h<12)h+=12;
+    if(!pm&&ampm[3]&&h===12)h=0;
+    return String(h).padStart(2,'0')+':'+m;
+  }
+  const m=s.match(/^(\d{1,2}):(\d{2})/);if(m)return m[1].padStart(2,'0')+':'+m[2];
+  return s.slice(0,5);
+}
+function getResults(){
+  if(activeDate==='all')return Object.entries(mappings).flatMap(([d,m])=>m.results.map(r=>({...r,_date:d})));
+  return(mappings[activeDate]?.results||[]).map(r=>({...r,_date:activeDate}));
+}
+
+// RENDER ASSIGNMENTS
+function renderAssignments(){
+  const con=document.getElementById('assignments-content');
+  const results=getResults();
+  if(!results.length){con.innerHTML='<div class="empty">Upload a trip file to begin</div>';return;}
+  const total=results.length;
+  const assigned=results.filter(r=>r.status==='Assigned'||manualOverrides[r._date+':'+r.auth]).length;
+  const unassigned=results.filter(r=>r.status==='Unassigned'&&!manualOverrides[r._date+':'+r.auth]).length;
+  const blocked=results.filter(r=>r.status==='Blocked').length;
+  const noVeh=results.filter(r=>(r.status==='Assigned'||manualOverrides[r._date+':'+r.auth])&&!r.vehicle).length;
+  const wr=results.filter(r=>r.isWR).length;
+  const shiftGapCount=results.filter(r=>r.shiftGap&&!manualOverrides[r._date+':'+r.auth]).length;
+  const pct=total?Math.round(assigned/total*100):0;
+  const pctClr=pct===100?'c-green':pct>=70?'c-yellow':'c-red';
+  const summaryDate = activeDate==='all'?allDates[0]:activeDate;
+  const crewCounts = getCrewCountsForDate(summaryDate);
+  const zoneSummary = getZoneSummaryForDate(summaryDate);
+  const tripZoneLabels = Object.entries(zoneSummary.tripZones).map(([z,c])=>z+':'+c).join(' ');
+  const crewZoneLabels = Object.entries(zoneSummary.crewZones).map(([z,c])=>z+':'+c).join(' ');
+  const vehicleNeedCount = results.filter(r=>r.flags?.some(f=>/NO VEHICLE|CREW AVAILABLE BUT NO VEHICLE/.test(f))).length;
+  const crewOnlyTrips = results.filter(r=>r.status==='Unassigned'&&!manualOverrides[r._date+':'+r.auth]&&!(r.candidateCrew?.length));
+  let estimatedCrewCount = 0;
+  try {
+    estimatedCrewCount = estimateAdditionalCrews(crewOnlyTrips);
+  } catch (err) {
+    console.warn('estimateAdditionalCrews failed', err);
+    estimatedCrewCount = 0;
+  }
+  const staffNeedCount = estimatedCrewCount;
+
+  let html='<div class="summary-bar">'
+    +'<div class="sum-card"><div class="sum-label">Total</div><div class="sum-val c-blue">'+total+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Assigned</div><div class="sum-val c-green">'+assigned+'</div><div class="sum-sub">'+pct+'%</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Unassigned</div><div class="sum-val c-red">'+unassigned+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Blocked</div><div class="sum-val c-orange">'+blocked+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Active Crew</div><div class="sum-val c-yellow">'+crewCounts.total+'</div><div class="sum-sub">EMT:'+crewCounts.EMT+' RN:'+crewCounts.RN+' NE:'+crewCounts['Non-EMT']+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Zones</div><div class="sum-val c-blue">T:'+Object.keys(zoneSummary.tripZones).length+' C:'+Object.keys(zoneSummary.crewZones).length+'</div><div class="sum-sub">Trips:'+tripZoneLabels+' Crew:'+crewZoneLabels+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">No Vehicle</div><div class="sum-val c-yellow">'+noVeh+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Need Staff (est.)</div><div class="sum-val c-red">'+staffNeedCount+'</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Need Vehicles</div><div class="sum-val c-orange">'+vehicleNeedCount+'</div></div>'
+    +'<div class="sum-card" style="border-color:rgba(45,212,191,.3)"><div class="sum-label">W&R</div><div class="sum-val c-teal">'+wr+'</div><div class="sum-sub">180m block</div></div>'
+    +'<div class="sum-card"><div class="sum-label">Coverage</div><div class="sum-val '+pctClr+'">'+pct+'%</div></div>'
+    +(shiftGapCount?'<div class="sum-card" style="border-color:rgba(251,146,60,.4)"><div class="sum-label">PM Gap</div><div class="sum-val" style="color:#fb923c;font-size:18px">'+shiftGapCount+'</div><div class="sum-sub">need PM crew</div></div>':'')
+    +'</div>';
+
+  if(pct<100||vehicleNeedCount||shiftGapCount){
+    const recs=[];
+    if(staffNeedCount) recs.push(staffNeedCount+' trip'+(staffNeedCount!==1?'s':'')+' need crew');
+    if(vehicleNeedCount) recs.push(vehicleNeedCount+' vehicle'+(vehicleNeedCount!==1?'s':'')+' needed');
+    if(shiftGapCount && !recs.includes(shiftGapCount+' trip'+(shiftGapCount!==1?'s':'')+' have no PM crew coverage')) recs.push(shiftGapCount+' PM crew gap');
+    html+='<div style="background:#081715;border:1px solid rgba(59,130,246,.25);border-radius:6px;padding:9px 13px;font-size:11px;color:#dbeafe;margin-bottom:11px;display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:14px">&#x1F4A1;</span>'
+      +'<div><strong>Recommendation:</strong> '+(recs.length?recs.join(' · '):'All good.')+'</div>'
+      +'</div>';
+  }
+
+  if(shiftGapCount>0){
+    html+='<div style="background:#1a1000;border:1px solid rgba(251,146,60,.4);border-radius:6px;padding:9px 13px;font-size:11px;color:#fb923c;margin-bottom:11px;display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:14px">&#x26A0;</span>'
+      +'<div><strong>'+shiftGapCount+' trip'+(shiftGapCount!==1?'s':'')+' have no PM crew coverage.</strong> '
+      +'All Non-EMT shifts end before these pickups. To cover them, add staff with later shift start times or a second shift roster.</div>'
+      +'</div>';
+  }
+  const byDate={};
+  results.forEach(r=>{if(!byDate[r._date])byDate[r._date]={};if(!byDate[r._date][r.zone])byDate[r._date][r.zone]=[];byDate[r._date][r.zone].push(r);});
+
+  Object.entries(byDate).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,zones])=>{
+    const dow=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long'});
+    html+='<div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px">'+date+' - '+dow+'</div>';
+
+    ['SACRAMENTO','SANTA CLARA'].forEach(zone=>{
+      const zTrips=zones[zone];if(!zTrips)return;
+      const zA=zTrips.filter(r=>r.status==='Assigned'||manualOverrides[date+':'+r.auth]).length;
+      const zU=zTrips.filter(r=>r.status==='Unassigned'&&!manualOverrides[date+':'+r.auth]).length;
+      const zB=zTrips.filter(r=>r.status==='Blocked').length;
+      const cls=zone==='SACRAMENTO'?'sac':'sc';
+
+      const rows=zTrips.sort((a,b)=>a.pickupMins-b.pickupMins).map(r=>{
+        const ok=date+':'+r.auth;
+        const mc=manualOverrides[ok];
+        const disp=mc||r.crewName;
+        const manual=!!mc;
+        const busy=mc&&crewBusy(date,mc,r);
+        const losCls=LOS_CLASS[r.los]||'los-wc';
+        const rule=LOS_RULES[r.los]||{crew:1};
+        const eff=r.specialEquip?Math.max(2,rule.crew):rule.crew;
+        const effSt=mc?'Assigned':r.status;
+        const wrStyle=r.isWR?'background:rgba(45,212,191,.06);border-left:3px solid rgba(45,212,191,.5);':'';
+        const specStyle=r.specialEquip?'border-left:3px solid var(--orange);':'';
+        const blockedStyle=r.status==='Blocked'?'background:rgba(239,68,68,.05);':'';
+        const cctWarn=r.flags?.includes('CCT CAP WARN');
+
+        // FUNNEL DROPDOWN: Inject filtered eligible crews
+        const validOpts = getValidCrewsForTrip(date, r);
+        let optHtml = '<option value="">-- assign eligible --</option>';
+        if (disp && !validOpts.find(o => o.name === disp)) {
+          let t = 'Ineligible/Busy';
+          if (r.crew && r.crew.length > 0) t = r.crew[0].type + ' - ' + t;
+          validOpts.push({name: disp, type: t});
+        }
+        optHtml += validOpts.map(c=>'<option value="'+c.name+'">'+c.name+' ('+c.type+')</option>').join('');
+
+        const isShiftGap=r.shiftGap&&!mc;
+        const spill=effSt==='Assigned'?'<span class="pill pill-assigned">'+(manual?'manual ':'')+'ok</span>'
+          :isShiftGap?'<span class="pill" style="background:#1a1000;color:#fb923c;border:1px solid rgba(251,146,60,.4)">PM shift gap</span>'
+          :effSt==='Blocked'?'<span class="pill" style="background:var(--orange-bg);color:var(--orange);border:1px solid rgba(249,115,22,.3)">blocked</span>'
+          :effSt==='Partial'?'<span class="pill pill-partial">partial</span>'
+          :'<span class="pill pill-unassigned">unassigned</span>';
+
+        const losCell=r.isWR
+          ?'<div style="display:flex;align-items:center;gap:5px"><span class="badge '+losCls+'">'+r.los+'</span><span class="wr-badge">W&R 180m</span></div>'
+          :r.specialEquip
+          ?'<div style="display:flex;align-items:center;gap:5px"><span class="badge '+losCls+'">'+r.los+'</span><span style="font-size:9px;background:var(--orange-bg);color:var(--orange);border:1px solid rgba(249,115,22,.3);border-radius:3px;padding:1px 5px">SPEC EQUIP</span></div>'
+          :'<span class="badge '+losCls+'">'+r.los+'</span>';
+
+        const isUnresolved = (effSt==='Unassigned'||effSt==='Blocked'||effSt==='Partial')&&!mc;
+        const isShiftGapFlag = r.shiftGap&&!mc;
+        const flagBg = isShiftGapFlag?'background:#1a1000;border:1px solid rgba(251,146,60,.3)':'background:var(--red-bg);border:1px solid var(--red-border)';
+        const flagLbl = isShiftGapFlag?'color:#fb923c':'color:var(--red)';
+        const flagTxt = isShiftGapFlag?'color:#fed7aa':'color:#fca5a5';
+        const flagX   = isShiftGapFlag?'color:#fb923c':'color:var(--red)';
+        const whyLabel = isShiftGapFlag?'PM shift gap:':'Why unassigned:';
+        const flagsHtml = r.flags?.filter(f=>f!=='CCT CAP WARN').length
+          ? '<div style="margin-top:4px;padding:5px 7px;'+flagBg+';border-radius:4px;display:flex;flex-direction:column;gap:2px">'
+            +(isUnresolved?'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;'+flagLbl+';margin-bottom:2px">'+whyLabel+'</div>':'')
+            +r.flags.filter(f=>f!=='CCT CAP WARN').map(f=>'<div style="font-size:10px;'+flagTxt+';font-family:var(--mono);display:flex;align-items:flex-start;gap:4px"><span style="'+flagX+';flex-shrink:0">&#x2715;</span>'+f+'</div>').join('')
+            +'</div>'
+          : '';
+
+        const dot=r.crew?.[0]?.type==='EMT'?'dot-emt':r.crew?.[0]?.type==='RN'?'dot-rn':'dot-ne';
+        const crewCell='<div>'
+          +(disp?'<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">'
+            +'<span class="crew-dot '+dot+'"></span>'
+            +'<span style="font-weight:600;font-size:11px">'+disp+'</span>'
+            +(busy?'<span style="font-size:9px;background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border);border-radius:3px;padding:1px 4px">Conflict</span>':'')
+            +(manual?'<span style="font-size:9px;color:var(--muted);font-style:italic">manual</span>':'')
+            +'</div>':'')
+          +'<div style="display:flex;align-items:center;gap:4px">'
+          +'<select onchange="setMC(\''+ok+'\',\''+date+'\',\''+r.auth+'\',this.value)" style="font-size:10px;padding:2px 5px;width:165px;cursor:pointer;color:var(--muted2)">'+optHtml.replace('value="'+(disp||'')+'"','value="'+(disp||'')+'" selected')+'</select>'
+          +(mc?'<span onclick="clearMC(\''+ok+'\')" style="font-size:10px;color:var(--muted);cursor:pointer;padding:1px 4px;border:1px solid var(--border);border-radius:3px;background:var(--panel)">x</span>':'')
+          +'</div>'
+          +'</div>';
+
+        const vehCell=r.vehicle
+          ?'<span style="font-family:var(--mono);font-size:10px;color:var(--muted2)">'+r.vehicle+'</span>'
+          :(effSt==='Assigned'||mc)?'<span style="font-size:10px;color:var(--red)">None avail</span>'
+          :'<span style="color:var(--muted);font-size:10px">-</span>';
+
+        const inTripKey=r.pickupAddr&&r.dropoffAddr?'inTrip '+r.pickupAddr+' '+r.dropoffAddr:null;
+        const inTripMins=inTripKey&&distCache[inTripKey]?distCache[inTripKey]:null;
+        const blockDisp=r.isWR?'W&R 180m':inTripMins?(inTripMins+'m trip'):(r.travelMins?'~'+r.travelMins+'m est':'');
+        const shiftCell=r.shiftStart!==null
+          ?'<div style="font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--muted2)">'
+            +'<div>Start: '+toHHMM(r.shiftStart)+'</div>'
+            +'<div style="color:#a3c45a">Lunch: '+toHHMM(r.lunchStart)+'</div>'
+            +(blockDisp?'<div style="color:var(--muted)">'+blockDisp+'</div>':'')
+            +'</div>'
+          :'<span style="color:var(--muted);font-size:10px">-</span>';
+
+        return '<tr style="'+wrStyle+specStyle+blockedStyle+'">'
+          +'<td><span style="font-family:var(--mono);font-size:10px;color:var(--accent)">'+r.auth+'</span></td>'
+          +'<td style="font-size:11px;font-weight:500;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.patient||'<span style="color:var(--muted);font-style:italic;font-size:10px">no name</span>')+'</td>'
+          +'<td>'+losCell+flagsHtml+'</td>'
+          +'<td style="font-family:var(--mono);font-size:11px">'+r.pickup+'</td>'
+          +'<td style="text-align:center;font-family:var(--mono);color:var(--muted2)">'+eff+'</td>'
+          +'<td>'+crewCell+'</td>'
+          +'<td>'+vehCell+'</td>'
+          +'<td>'+shiftCell+'</td>'
+          +'<td>'+spill+(cctWarn?'<span style="font-size:9px;font-family:var(--mono);background:var(--orange-bg);color:var(--orange);border:1px solid rgba(249,115,22,.3);border-radius:3px;padding:1px 4px;margin-left:3px">CCT-CAP</span>':'')+'</td>'
+          +'</tr>';
+      }).join('');
+
+      html+='<div class="zone-block">'
+        +'<div class="zone-hdr '+cls+'">'
+        +'<span>'+zone+'</span>'
+        +'<span class="shift-info">Shift = first pickup - travel offset . 8h30 total . Lunch at 4.5hr</span>'
+        +'<div class="z-stats">'
+        +'<span class="zs-chip" style="background:var(--green-bg);color:var(--green)">'+zA+' assigned</span>'
+        +(zU?'<span class="zs-chip" style="background:var(--red-bg);color:var(--red)">'+zU+' unassigned</span>':'')
+        +(zB?'<span class="zs-chip" style="background:var(--orange-bg);color:var(--orange)">'+zB+' blocked</span>':'')
+        +'</div></div>'
+        +'<table><thead><tr>'
+        +'<th>Auth No</th><th>Patient</th><th>Level of Service</th>'
+        +'<th>Pickup</th><th style="text-align:center">Crew #</th>'
+        +'<th>Assigned Crew</th><th>Vehicle</th><th>Shift / Lunch</th><th>Status</th>'
+        +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+    });
+  });
+  con.innerHTML=html;
+}
+
+function setMC(key,date,auth,name){
+  if(!name){delete manualOverrides[key];renderAssignments();return;}
+  const trip = mappings[date]?.results?.find(t=>t.auth===auth);
+  if(trip && crewBusy(date,name,trip)) toast('Warning: '+name+' has a conflicting trip - assigned anyway','warn');
+  manualOverrides[key]=name;renderAssignments();
+}
+function clearMC(key){delete manualOverrides[key];renderAssignments();}
+
+// RENDER CREWS
+function renderCrews(){
+  const con=document.getElementById('crews-content');
+  const date=activeDate==='all'?allDates[0]:activeDate;
+  if(!date||!mappings[date]){con.innerHTML='<div class="empty">Run mapping to see crews</div>';return;}
+  const{empState,emtPairs}=mappings[date];
+  const dow=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long'});
+  document.getElementById('crewCount').textContent=date+' - '+dow;
+  document.getElementById('nb-crews').textContent=Object.keys(emtPairs).length;
+
+  const neSeen=new Set();
+  const nePairs={};
+  mappings[date].results.forEach(r=>{
+    if(r.crew?.length===2&&r.crew[0].type==='Non-EMT'){
+      const[c1,c2]=r.crew;
+      nePairs[c1.id]=nePairs[c1.id]||new Set();nePairs[c1.id].add(c2.id);
+      nePairs[c2.id]=nePairs[c2.id]||new Set();nePairs[c2.id].add(c1.id);
+    }
+  });
+
+  const crews=[];
+  Object.entries(emtPairs).forEach(([pk,p])=>{
+    const[aId,bId]=p.ids,a=empState[aId],b=empState[bId];if(!a||!b)return;
+    const ss=a.shiftStart!==null?toHHMM(a.shiftStart):'--',se=a.shiftEnd!==null?toHHMM(a.shiftEnd):'--',ls=a.lunchStart!==null?toHHMM(a.lunchStart):'--';
+    crews.push({key:pk,cls:'emt-c',type:'EMT Pair',zone:p.zone,crewName:p.crewName||p.defaultName,defaultName:p.defaultName||lastName(a.name)+' / '+lastName(b.name),members:[a,b],tripCount:a.assignments.length,ss,se,ls});
+  });
+  Object.values(empState).filter(e=>e.type==='RN'&&e.active).forEach(e=>{
+    const key='rn_'+e.id,ss=e.shiftStart!==null?toHHMM(e.shiftStart):'--',se=e.shiftEnd!==null?toHHMM(e.shiftEnd):'--',ls=e.lunchStart!==null?toHHMM(e.lunchStart):'--';
+    crews.push({key,cls:'rn-c',type:'RN',zone:e.zone,crewName:e.crewName||lastName(e.name),defaultName:lastName(e.name),members:[e],tripCount:e.assignments.length,ss,se,ls});
+  });
+  Object.values(empState).filter(e=>e.type==='Non-EMT'&&e.active).forEach(e=>{
+    if(neSeen.has(e.id))return;
+    const key='ne_'+e.id;
+    const partners=nePairs[e.id]?[...nePairs[e.id]]:[];
+    const partner=partners.length===1?empState[partners[0]]:null;
+    if(partner&&!neSeen.has(partner.id)){
+      neSeen.add(e.id);neSeen.add(partner.id);
+      const pk='ne_pair_'+e.id+'_'+partner.id;
+      const ss=e.shiftStart!==null?toHHMM(e.shiftStart):'--',se=e.shiftEnd!==null?toHHMM(e.shiftEnd):'--',ls=e.lunchStart!==null?toHHMM(e.lunchStart):'--';
+      const cn=crewNameOverrides[pk]||lastName(e.name)+' / '+lastName(partner.name);
+      const tc=[...new Set([...e.assignments.map(a=>a.auth),...partner.assignments.map(a=>a.auth)])].length;
+      crews.push({key:pk,cls:'ne-c',type:'Non-EMT Pair',zone:e.zone,crewName:cn,defaultName:lastName(e.name)+' / '+lastName(partner.name),members:[e,partner],tripCount:tc,ss,se,ls});
+    }else{
+      neSeen.add(e.id);
+      const ss=e.shiftStart!==null?toHHMM(e.shiftStart):'--',se=e.shiftEnd!==null?toHHMM(e.shiftEnd):'--',ls=e.lunchStart!==null?toHHMM(e.lunchStart):'--';
+      crews.push({key,cls:'ne-c',type:'Non-EMT',zone:e.zone,crewName:e.crewName||lastName(e.name),defaultName:lastName(e.name),members:[e],tripCount:e.assignments.length,ss,se,ls});
+    }
+  });
+  crews.sort((a,b)=>a.zone.localeCompare(b.zone)||(a.type===b.type?0:a.type.includes('EMT')?-1:1)||a.crewName.localeCompare(b.crewName));
+
+  const byZone={};crews.forEach(c=>{byZone[c.zone]=byZone[c.zone]||[];byZone[c.zone].push(c);});
+  let html='';
+  ['SACRAMENTO','SANTA CLARA'].forEach(zone=>{
+    const zc=byZone[zone];if(!zc)return;
+    const cls=zone==='SACRAMENTO'?'sac':'sc';
+    html+='<div style="margin-bottom:18px">'
+      +'<div class="zone-hdr '+cls+'" style="border-radius:var(--r) var(--r) 0 0;border:1px solid var(--border2)">'
+      +'<span>'+zone+'</span>'
+      +'<span class="shift-info">Shift = first pickup - travel offset . 8h30 . Lunch at 4.5hr</span>'
+      +'<div class="z-stats">'
+      +'<span class="zs-chip" style="background:var(--purple-bg);color:var(--purple)">'+zc.filter(c=>c.type==='EMT Pair').length+' EMT pairs</span>'
+      +'<span class="zs-chip" style="background:var(--sac);color:#93c5fd">'+zc.filter(c=>c.type.includes('Non-EMT')).length+' Non-EMT</span>'
+      +(zc.filter(c=>c.type==='RN').length?'<span class="zs-chip" style="background:var(--teal-bg);color:var(--teal)">'+zc.filter(c=>c.type==='RN').length+' RN</span>':'')
+      +'</div></div>'
+      +'<div class="crews-grid" style="padding:12px;background:var(--panel);border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--r) var(--r)">';
+
+    zc.forEach(crew=>{
+      const mrows=crew.members.map(m=>{
+        const dot=m.type==='EMT'?'dot-emt':m.type==='RN'?'dot-rn':'dot-ne';
+        return '<div class="cmr"><span class="crew-dot '+dot+'"></span><span style="flex:1;font-weight:500">'+m.name+'</span><span style="font-size:9px;color:var(--muted)">'+m.type+' . '+m.assignments.length+' trip'+(m.assignments.length!==1?'s':'')+'</span></div>';
+      }).join('');
+
+      const allA=[...new Set(crew.members.flatMap(m=>m.assignments.map(a=>a.auth)))].sort((a,b)=>{
+        const pa=crew.members[0].assignments.find(x=>x.auth===a)?.pickup||0;
+        const pb=crew.members[0].assignments.find(x=>x.auth===b)?.pickup||0;
+        return pa-pb;
+      });
+      const tlist=allA.length?allA.map(auth=>{
+        const asgn=crew.members[0].assignments.find(x=>x.auth===auth);
+        const lc=LOS_CLASS[asgn?.los]||'los-wc';
+        const wr=asgn?.isWR?'<span class="wr-badge">W&R</span>':'';
+        return '<div style="display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:3px;background:var(--bg);border:1px solid var(--border);margin:2px 0">'
+          +'<span style="font-family:var(--mono);font-size:10px;color:var(--accent);width:68px">'+auth+'</span>'
+          +'<span class="badge '+lc+'" style="font-size:9px;padding:1px 4px">'+(asgn?.los||'')+'</span>'
+          +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted2);margin-left:auto">'+(asgn?toHHMM(asgn.pickup):'')+'</span>'
+          +wr+'</div>';
+      }).join(''):'<span style="color:var(--muted);font-size:10px;font-style:italic">No trips assigned</span>';
+
+      const crewVehicles=[...new Set(crew.members.flatMap(m=>m.vehicle? [m.vehicle] : []))];
+      const vehicleLabel=crewVehicles.length?crewVehicles.join(', '):'Unassigned';
+
+      const shiftBar=crew.ss==='--'
+        ?'<div style="background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:7px 10px;margin-bottom:8px;font-size:11px;color:var(--muted);text-align:center;font-style:italic">No trips - shift TBD</div>'
+        :'<div class="shift-block">'
+          +'<div class="sh-seg"><div class="sh-seg-lbl">Start</div><div class="sh-seg-val">'+crew.ss+'</div></div>'
+          +'<div class="sh-mid"><div class="sh-stripe"></div><div class="sh-mid-txt">8h30</div></div>'
+          +'<div class="sh-lunch"><div class="sh-lunch-lbl">Lunch</div><div class="sh-lunch-val">'+crew.ls+'</div></div>'
+          +'<div class="sh-seg"><div class="sh-seg-lbl">End</div><div class="sh-seg-val">'+crew.se+'</div></div>'
+          +'</div>';
+
+      const typeBg=crew.type==='EMT Pair'?'var(--purple-bg)':crew.type==='RN'?'var(--teal-bg)':'var(--sac)';
+      const typeClr=crew.type==='EMT Pair'?'var(--purple)':crew.type==='RN'?'var(--teal)':'#93c5fd';
+      const icon=crew.type==='EMT Pair'?'A':crew.type==='RN'?'R':'W';
+
+      html+='<div class="crew-card '+crew.cls+'">'
+        +'<div class="crew-card-top">'
+        +'<span style="font-size:15px">'+icon+'</span>'
+        +'<span class="crew-name-display" id="cnl-'+crew.key+'" onclick="startRename(\''+crew.key+'\')" title="Click to rename">'+crew.crewName+'</span>'
+        +'<span class="badge" style="background:'+typeBg+';color:'+typeClr+';border:1px solid '+typeClr+'30">'+crew.type+'</span>'
+        +'</div>'
+        +shiftBar
+        +'<div class="crew-members">'+mrows+'</div>'
+        +'<div class="crew-stats">'
+        +'<span>'+zone+'</span>'
+        +'<span>'+crew.tripCount+' trip'+(crew.tripCount!==1?'s':'')+'</span>'
+        +'<span>Vehicle: '+vehicleLabel+'</span>'
+        +'</div>'
+        +'<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border)">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px">Assigned Trips</div>'
+        +tlist+'</div>'
+        +'</div>';
+    });
+    html+='</div></div>';
+  });
+  con.innerHTML=html;
+}
+
+function startRename(key){
+  const lbl=document.getElementById('cnl-'+key);if(!lbl)return;
+  const cur=lbl.textContent.trim();
+  const inp=document.createElement('input');inp.className='crew-name-input';inp.value=cur;inp.style.flex='1';
+  lbl.replaceWith(inp);inp.focus();inp.select();
+  const commit=()=>{
+    const nv=inp.value.trim()||cur;crewNameOverrides[key]=nv;saveRoster();
+    Object.values(mappings).forEach(m=>{
+      if(m.emtPairs?.[key])m.emtPairs[key].crewName=nv;
+      m.results?.forEach(r=>{if(r.crew?.[0]){const e=m.empState?.[r.crew[0].id];if(e&&(e.pairId===key||'ne_'+e.id===key||'rn_'+e.id===key)){r.crewName=nv;e.crewName=nv;}}});
+    });
+    renderCrews();toast('Renamed to "'+nv+'"');
+  };
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.value=cur;inp.blur();}});
+}
+
+// RENDER AVAILABILITY
+function renderAvailability(){
+  const grid=document.getElementById('availGrid');
+  const date=activeDate==='all'?allDates[0]:activeDate;
+  if(!date||!mappings[date]){grid.innerHTML='<div class="empty">Run mapping first</div>';return;}
+  const{empState,emtPairs}=mappings[date];
+  const pairLabels={};
+  Object.values(emtPairs).forEach(p=>{const[a,b]=p.ids;const ea=empState[a],eb=empState[b];if(ea&&eb){pairLabels[a]=eb.name;pairLabels[b]=ea.name;}});
+
+  let html='';
+  Object.values(empState).sort((a,b)=>a.zone.localeCompare(b.zone)||(a.type===b.type?0:a.type==='EMT'?-1:1)||a.name.localeCompare(b.name)).forEach(emp=>{
+    const ss=emp.shiftStart!==null?toHHMM(emp.shiftStart):'--';
+    const se=emp.shiftEnd!==null?toHHMM(emp.shiftEnd):'--';
+    const ls=emp.lunchStart!==null?toHHMM(emp.lunchStart):'--';
+    const remMins=getRemainingShiftMinutes(emp);
+    const remLabel = remMins!==null ? '<span style="font-size:10px;color:'+ (remMins>=90 ? '#22c55e' : remMins>=30 ? '#f59e0b' : '#ef4444') +';">Remaining '+remMins+'m</span>' : '';
+    const dot=emp.type==='EMT'?'dot-emt':emp.type==='RN'?'dot-rn':'dot-ne';
+    const typeBg=emp.type==='EMT'?'var(--purple-bg)':emp.type==='RN'?'var(--teal-bg)':'var(--sac)';
+    const typeClr=emp.type==='EMT'?'var(--purple)':emp.type==='RN'?'var(--teal)':'#93c5fd';
+    const zoneTag='<span class="emp-zone-tag '+(emp.zone==='SACRAMENTO'?'tz-sac':'tz-sc')+'">'+emp.zone+'</span>';
+    const pairTag=emp.type==='EMT'&&emp.pairId!=='UNPAIRED'&&pairLabels[emp.id]
+      ?'<span style="font-size:9px;background:var(--purple-bg);color:var(--purple);border:1px solid #7c3aed30;border-radius:3px;padding:1px 5px;font-family:var(--mono)">w/ '+lastName(pairLabels[emp.id])+'</span>'
+      :emp.pairId==='UNPAIRED'?'<span style="font-size:9px;background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);border-radius:3px;padding:1px 5px">Unpaired</span>':'';
+
+    let tripsHtml='';
+    if(!emp.active)tripsHtml='<div class="idle-note">'+emp.status+'</div>';
+    else if(!emp.assignments.length)tripsHtml='<div class="idle-note">Idle - no trips assigned</div>';
+    else{
+      emp.assignments.forEach((a,i)=>{
+        const nxt=i+1<emp.assignments.length?emp.assignments[i+1].pickup:emp.shiftEnd;
+        const until=Math.min(nxt,emp.shiftEnd);
+        const win=Math.max(0,until-a.blockEnd);
+        const cls=win>=90?'f-ok':win>=30?'f-warn':'f-none';
+        const lc=LOS_CLASS[a.los]||'los-wc';
+        const blkLabel=a.isWR?'W&R 180m':(a.blkMins?a.blkMins+'m block':'~'+COMPLETION+'m');
+        tripsHtml+='<div class="avail-trip">'
+          +'<span class="at-auth">'+(a.isWR?'W&R ':'')+a.auth+'</span>'
+          +'<span class="at-time">'+toHHMM(a.pickup)+'</span>'
+          +'<span class="badge '+lc+'" style="font-size:9px;padding:1px 4px">'+a.los+'</span>'
+          +(a.vehicle?'<span style="font-family:var(--mono);font-size:9px;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 5px;margin-left:3px">'+a.vehicle+'</span>':'')
+          +'<span style="font-size:9px;color:var(--muted);font-family:var(--mono);margin-left:3px">'+blkLabel+'</span>'
+          +'<span class="at-free '+cls+'" style="margin-left:auto">'+(win>0?win+'m free':'back-to-back')+'</span>'
+          +'</div>';
+      });
+      const lastEnd=emp.assignments[emp.assignments.length-1].blockEnd;
+      const rem=Math.max(0,emp.shiftEnd-lastEnd);
+      if(rem>0)tripsHtml+='<div style="font-size:10px;color:var(--muted);padding-top:4px;text-align:right">'+rem+'m remaining</div>';
+    }
+
+    html+='<div class="emp-card '+(!emp.active?'blocked':'')+'">'
+      +'<div class="emp-card-top"><span class="crew-dot '+dot+'"></span><span class="emp-name">'+emp.name+'</span>'
+      +'<span class="badge" style="background:'+typeBg+';color:'+typeClr+';border:1px solid '+typeClr+'30">'+emp.type+'</span></div>'
+      +(pairTag?'<div style="margin-bottom:6px">'+pairTag+'</div>':'')
+      +(()=>{
+        // Vehicle handoff tag: show when another crew holds this vehicle before this shift starts
+        const empVeh=emp.vehicle;
+        if(!empVeh)return '';
+        const otherClaims=(vehShiftMap[empVeh]||[]).filter(w=>w.owner!==emp.id&&w.shiftEnd>(emp.shiftStart||0));
+        otherClaims.sort((a,b)=>b.shiftEnd-a.shiftEnd);
+        const handoff=otherClaims[0]||null;
+        if(handoff&&handoff.shiftEnd>(emp.shiftStart||0))
+          return '<div style="margin-bottom:6px"><span style="font-size:9px;background:#1a1000;color:#fb923c;border:1px solid rgba(251,146,60,.4);border-radius:3px;padding:2px 7px;font-family:var(--mono)">&#x1F690; '+empVeh+' available after '+toHHMM(handoff.shiftEnd)+'</span></div>';
+        return '<div style="margin-bottom:6px"><span style="font-family:var(--mono);font-size:9px;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:2px 7px">'+empVeh+'</span></div>';
+      })()
+      +'<div class="emp-meta">'+zoneTag+'<span>'+ss+' - '+se+'</span>'+(ls!=='--'?'<span style="color:#a3c45a">Lunch '+ls+'</span>':'')+'<span>'+emp.assignments.length+' trip'+(emp.assignments.length!==1?'s':'')+'</span></div>'
+      +(remLabel?'<div style="margin:4px 0 8px">'+remLabel+'</div>':'')
+      +tripsHtml+'</div>';
+  });
+  grid.innerHTML=html||'<div class="empty">No staff</div>';
+}
+
+// RENDER ROSTER
+function renderRoster(){
+  const todayDow=allDates.length?dowIndex(allDates[0]):(new Date().getDay()+6)%7;
+  const body=document.getElementById('rosterBody');
+  body.innerHTML=roster.map((emp,i)=>{
+    const active=emp.status==='Active'&&emp.days[todayDow];
+    const sc={Active:'stat-active','Inactive / Terminated':'stat-inactive','On Leave':'stat-leave',Suspended:'stat-suspended'}[emp.status]||'';
+    const chips=DAYS.map((d,di)=>'<span class="dc '+(emp.days[di]?'on':'off')+(di===todayDow?' today':'')+'" onclick="toggleDay('+emp.id+','+di+')" title="'+d+'">'+d+'</span>').join('');
+    return '<div class="roster-row '+(!active?'blocked':'')+'">'
+      +'<div class="rn-num">'+(i+1)+'</div>'
+      +'<div><input type="text" value="'+emp.name+'" onchange="updateEmp('+emp.id+',\'name\',this.value)"/></div>'
+      +'<div><select onchange="updateEmp('+emp.id+',\'zone\',this.value)"><option '+(emp.zone==='SACRAMENTO'?'selected':'')+'>SACRAMENTO</option><option '+(emp.zone==='SANTA CLARA'?'selected':'')+'>SANTA CLARA</option></select></div>'
+      +'<div><select onchange="updateEmp('+emp.id+',\'type\',this.value)"><option '+(emp.type==='Non-EMT'?'selected':'')+'>Non-EMT</option><option '+(emp.type==='EMT'?'selected':'')+'>EMT</option><option '+(emp.type==='RN'?'selected':'')+'>RN</option></select></div>'
+      +'<div><select class="'+sc+'" onchange="updateEmp('+emp.id+',\'status\',this.value)" style="font-weight:700">'
+      +'<option '+(emp.status==='Active'?'selected':'')+'>Active</option>'
+      +'<option '+(emp.status==='Inactive / Terminated'?'selected':'')+'>Inactive / Terminated</option>'
+      +'<option '+(emp.status==='On Leave'?'selected':'')+'>On Leave</option>'
+      +'<option '+(emp.status==='Suspended'?'selected':'')+'>Suspended</option>'
+      +'</select></div>'
+      +'<div><div class="day-chips">'+chips+'</div></div>'
+      +'<div><button class="btn btn-danger btn-sm" onclick="removeEmp('+emp.id+')">X</button></div>'
+      +'</div>';
+  }).join('');
+  const active=roster.filter(e=>e.status==='Active').length;
+  document.getElementById('rosterCount').textContent=active+' active / '+roster.length+' total';
+  document.getElementById('nb-roster').textContent=active;
+}
+function updateEmp(id,f,v){const e=roster.find(r=>r.id===id);if(!e)return;e[f]=v;saveRoster();renderRoster();}
+function toggleDay(id,di){const e=roster.find(r=>r.id===id);if(e){e.days[di]=e.days[di]?0:1;saveRoster();renderRoster();}}
+function removeEmp(id){roster=roster.filter(e=>e.id!==id);saveRoster();renderRoster();toast('Removed - re-run mapping');}
+function addEmployee(){
+  const name=document.getElementById('newName').value.trim();if(!name){toast('Enter a name','warn');return;}
+  roster.push({id:nextId++,name,zone:document.getElementById('newZone').value,type:document.getElementById('newType').value,status:'Active',days:[1,1,1,1,1,1,1]});
+  document.getElementById('newName').value='';saveRoster();renderRoster();toast('Added - re-run mapping');
+}
+
+// RENDER VEHICLES
+function renderVehicles(){
+  const con=document.getElementById('veh-content');
+  const total=vehicles.length,inSvc=vehicles.filter(v=>v.status==='In-Service'||v.status==='In Service').length;
+  document.getElementById('vehCount').textContent=inSvc+' in service / '+total+' total';
+  document.getElementById('nb-veh').textContent=inSvc;
+  const byZone={};vehicles.forEach(v=>{const z=v.location||'UNKNOWN';byZone[z]=byZone[z]||[];byZone[z].push(v);});
+  let html='';
+  ['SACRAMENTO','SANTA CLARA'].forEach(zone=>{
+    const zvs=byZone[zone];if(!zvs)return;
+    const cls=zone==='SACRAMENTO'?'sac':'sc';
+    html+='<div style="margin-bottom:18px">'
+      +'<div class="zone-hdr '+cls+'" style="border-radius:var(--r) var(--r) 0 0;border:1px solid var(--border2)">'
+      +'<span>'+zone+'</span>'
+      +'<div class="z-stats">'
+      +'<span class="zs-chip" style="background:var(--green-bg);color:var(--green)">'+zvs.filter(v=>v.status==='In-Service'||v.status==='In Service').length+' in service</span>'
+      +'<span class="zs-chip" style="background:var(--yellow-bg);color:var(--yellow)">'+zvs.filter(v=>v.type==='Gurney Van').length+' Gurney Vans</span>'
+      +'<span class="zs-chip" style="background:var(--teal-bg);color:var(--teal)">'+zvs.filter(v=>v.type==='Ambulance').length+' Ambulances</span>'
+      +'</div></div>'
+      +'<div class="veh-grid" style="background:var(--panel);padding:12px;border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--r) var(--r)">';
+    zvs.sort((a,b)=>a.type.localeCompare(b.type)||a.name.localeCompare(b.name)).forEach(v=>{
+      const is=v.status==='In-Service'||v.status==='In Service';
+      const typeBg=v.type==='Ambulance'?'var(--red-bg)':v.type==='Gurney Van'?'var(--yellow-bg)':'var(--sac)';
+      const typeClr=v.type==='Ambulance'?'var(--red)':v.type==='Gurney Van'?'var(--yellow)':'#93c5fd';
+      html+='<div class="veh-card '+(!is?'oos':'')+'">'
+        +'<div style="display:flex;align-items:flex-start;gap:8px">'
+        +'<div style="flex:1"><div style="font-family:var(--mono);font-weight:600;font-size:15px">'+v.name+'</div><div style="font-size:10px;color:var(--muted);font-family:var(--mono)">'+v.plate+'</div></div>'
+        +'<span class="badge" style="background:'+typeBg+';color:'+typeClr+';border:1px solid '+typeClr+'30">'+v.type+'</span>'
+        +'</div>'
+        +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;align-items:center">'
+        +'<select onchange="updateVeh('+v.id+',\'status\',this.value)" style="font-size:10px;padding:2px 5px;width:auto"><option '+(is?'selected':'')+'>In-Service</option><option '+(!is?'selected':'')+'>Out of Service</option></select>'
+        +'<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted2);cursor:pointer"><input type="checkbox" '+(v.bariatric?'checked':'')+' onchange="updateVeh('+v.id+',\'bariatric\',this.checked)" style="width:auto"/> Bariatric</label>'
+        +'</div>'
+        +(v.type==='Gurney Van'?'<div style="font-size:9px;color:var(--muted);margin-top:5px">Also serves Electric WC transports</div>':'')
+        +'</div>';
+    });
+    html+='</div></div>';
+  });
+  con.innerHTML=html;
+}
+function updateVeh(id,f,v){const veh=vehicles.find(x=>x.id===id);if(!veh)return;veh[f]=v;saveVehicles();renderVehicles();}
+
+// DATE UI & NAV
+function updateDateUI(){
+  const sel=document.getElementById('dateFilter');
+  sel.innerHTML='<option value="all">All dates</option>'+allDates.map(d=>{
+    const dow=new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'});
+    return '<option value="'+d+'">'+d+' ('+dow+')</option>';
+  }).join('');
+  sel.value=activeDate;
+  const list=document.getElementById('dateList');
+  if(!allDates.length){list.innerHTML='<div style="color:var(--muted);font-size:11px;font-style:italic">Upload trip file</div>';return;}
+  list.innerHTML=allDates.map(d=>{
+    const m=mappings[d],tot=m?.results?.length||0,asgn=m?.results?.filter(r=>r.status==='Assigned').length||0;
+    const pct=tot?Math.round(asgn/tot*100):0;
+    const clr=pct===100?'var(--green)':pct>=70?'var(--yellow)':'var(--red)';
+    const dow=new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'});
+    return '<div class="date-item '+(activeDate===d?'active':'')+'" onclick="selectDate(\''+d+'\')">'
+      +'<span class="date-dot"></span><span>'+d+' <span style="color:var(--muted);font-size:10px">'+dow+'</span></span>'
+      +'<span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:'+clr+'">'+pct+'%</span>'
+      +'</div>';
+  }).join('')+'<div class="date-item '+(activeDate==='all'?'active':'')+'" onclick="selectDate(\'all\')" style="margin-top:3px">'
+    +'<span class="date-dot" style="background:var(--accent)"></span><span style="color:var(--muted2)">All dates</span></div>';
+  document.getElementById('topDatePill').textContent=allDates.length===1
+    ?allDates[0]+' ('+new Date(allDates[0]+'T00:00:00').toLocaleDateString('en-US',{weekday:'long'})+')'
+    :allDates.length+' dates loaded';
+}
+function selectDate(d){activeDate=d;updateDateUI();document.getElementById('dateFilter').value=d;renderCurrentView();}
+function updateNavBadges(){
+  const r=getResults();
+  const u=r.filter(x=>x.status!=='Assigned'&&!manualOverrides[x._date+':'+x.auth]).length;
+  document.getElementById('nb-assign').textContent=u?u+' issues':r.length+' trips';
+}
+function renderCurrentView(){
+  if(activeView==='assignments')renderAssignments();
+  else if(activeView==='crews')renderCrews();
+  else if(activeView==='availability')renderAvailability();
+  else if(activeView==='forecast')renderForecast();
+  else if(activeView==='roster')renderRoster();
+  else if(activeView==='vehicles')renderVehicles();
+}
+function switchView(view,el){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');switchTab(view,document.getElementById('tab-'+view));}
+function switchTab(view,el){
+  activeView=view;
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+view)?.classList.add('active');
+  if(el)el.classList.add('active');
+  renderCurrentView();
+}
+
+// TOAST & SETTINGS
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='',2800);}
+function loadSettings(){
+  document.getElementById('googleApiKey').value=settings.apiKey||'';
+  document.getElementById('sacAddress').value=settings.sacAddress||'';
+  document.getElementById('scAddress').value=settings.scAddress||'';
+  const hbT=document.getElementById('hbToken');if(hbT)hbT.value=settings.hbToken||'';
+  const hbSU=document.getElementById('hbSacUuid');if(hbSU)hbSU.value=settings.hbSacUuid||'';
+  const hbScU=document.getElementById('hbScUuid');if(hbScU)hbScU.value=settings.hbScUuid||'';
+  const hbEn=document.getElementById('hbEnabled');if(hbEn)hbEn.checked=settings.hbEnabled||false;
+  const hbNE=document.getElementById('hbRoleNE');if(hbNE)hbNE.value=settings.hbRoleNE||'Non-EMT,Driver,NEMT,Non EMT';
+  const hbEMT=document.getElementById('hbRoleEMT');if(hbEMT)hbEMT.value=settings.hbRoleEMT||'EMT,EMT-B,Paramedic,EMT Basic';
+  const hbRN=document.getElementById('hbRoleRN');if(hbRN)hbRN.value=settings.hbRoleRN||'RN,Nurse,Registered Nurse,LVN';
+  const hbDS=document.getElementById('hbDeptSac');if(hbDS)hbDS.value=settings.hbDeptSac||'';
+  const hbDSc=document.getElementById('hbDeptSc');if(hbDSc)hbDSc.value=settings.hbDeptSc||'';
+  const zUrl=document.getElementById('zohoApiUrl');if(zUrl)zUrl.value=settings.zohoApiUrl||'';
+  const zAuth=document.getElementById('zohoAuthType');if(zAuth)zAuth.value=settings.zohoAuthType||'API Key';
+  const zToken=document.getElementById('zohoApiToken');if(zToken)zToken.value=settings.zohoApiToken||'';
+  const zFrom=document.getElementById('zohoDateFrom');if(zFrom)zFrom.value=settings.zohoDateFrom||'';
+  const zTo=document.getElementById('zohoDateTo');if(zTo)zTo.value=settings.zohoDateTo||'';
+  updateCacheCount();
+  updateHbStatus();
+}
+
+// INIT
+loadAll();
+renderRoster();
+renderVehicles();
+loadSettings();
+updateDateUI();
+setTimeout(()=>toast('Roster loaded: '+roster.length+' employees, '+vehicles.length+' vehicles'),300);
+</script>
+</body>
+</html>
