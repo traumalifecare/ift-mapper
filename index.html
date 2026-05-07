@@ -537,6 +537,24 @@ let scheduleData={};  // date → [{vehicle,names,shiftStart,shiftEnd,zone}] fro
 let historicalDemand={};
 let roster=[],vehicles=[];
 
+function isTokenValue(v){
+  return /^__[A-Z0-9_]+__$/.test(String(v||'').trim());
+}
+function cleanTokenValue(v,fallback=''){
+  const s=String(v??'').trim();
+  return isTokenValue(s)?fallback:s;
+}
+function sanitizeSettingsTokens(){
+  settings.apiKey=cleanTokenValue(settings.apiKey,'');
+  settings.sacAddress=cleanTokenValue(settings.sacAddress,'123 Main St, Sacramento, CA 95814');
+  settings.scAddress=cleanTokenValue(settings.scAddress,'456 Park Ave, Santa Clara, CA 95050');
+  settings.hbToken=cleanTokenValue(settings.hbToken,'');
+  settings.hbSacUuid=cleanTokenValue(settings.hbSacUuid,'');
+  settings.hbScUuid=cleanTokenValue(settings.hbScUuid,'');
+  settings.zohoApiUrl=cleanTokenValue(settings.zohoApiUrl,'');
+  settings.zohoApiToken=cleanTokenValue(settings.zohoApiToken,'');
+}
+
 // PERSISTENCE
 function saveRoster(){
   try{localStorage.setItem('ift5_roster',JSON.stringify({roster,nextId}));localStorage.setItem('ift5_cnames',JSON.stringify(crewNameOverrides));flashSave();}catch(e){}
@@ -570,6 +588,7 @@ function loadAll(){
     const cn=localStorage.getItem('ift5_cnames');if(cn)crewNameOverrides=JSON.parse(cn);
     const vr=localStorage.getItem('ift5_vehicles');if(vr)vehicles=JSON.parse(vr);else buildDefaultVehicles();
     const st=localStorage.getItem('ift5_settings');if(st){try{const saved=JSON.parse(st);Object.assign(settings,saved);}catch(e){}}
+    sanitizeSettingsTokens();
     const tc=localStorage.getItem('ift5_tcache');if(tc)travelCache=JSON.parse(tc);
     const dc=localStorage.getItem('ift5_distcache');if(dc)distCache=JSON.parse(dc);
   }catch(e){buildDefaultRoster();buildDefaultVehicles();}
