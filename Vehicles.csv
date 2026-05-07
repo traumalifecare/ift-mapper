@@ -1,0 +1,18 @@
+Vehicle Name,Status,Zone,Certification,Bariatric
+GW011,Active,Santa Clara,Non-EMT,TRUE
+GW012,Active,Sacramento,Non-EMT,TRUE
+GW010,Active,Sacramento,Non-EMT,TRUE
+GW009,Active,Sacramento,Non-EMT,TRUE
+GW008,Active,Santa Clara,Non-EMT,TRUE
+GW007,Active,Sacramento,Non-EMT,TRUE
+WC005,Active,Sacramento,Non-EMT,FALSE
+WC004,Active,Santa Clara,Non-EMT,FALSE
+M26,Active,Sacramento,EMT,TRUE
+M20,Active,Sacramento,EMT,TRUE
+M25,Active,Sacramento,EMT,TRUE
+M23,Active,Sacramento,EMT,TRUE
+GW002,Active,Sacramento,Non-EMT,TRUE
+M24,Active,Sacramento,EMT,TRUE
+GW003,Active,Sacramento,Non-EMT,TRUE
+WC006,In-Active,Sacramento,Non-EMT,FALSE
+GW013,In-Active,Sacramento,Non-EMT,TRUE
